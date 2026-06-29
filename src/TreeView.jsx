@@ -3,7 +3,7 @@ import NodeTree from "./NodeTree";
 
 export default function TreeView({ data }) {
 
-    const[selectedNodeId ,setSelectedNodeId] = useState("");
+    const[selectedNodeId ,setSelectedNodeId] = useState(null);
 
 
     console.log("Data" ,JSON.stringify(data));
@@ -16,6 +16,8 @@ export default function TreeView({ data }) {
                 <NodeTree
                     key={node.id}
                     node={node}
+                      selectedNodeId={selectedNodeId}
+                    setSelectedNodeId={setSelectedNodeId}
                 />
 
             ))}
