@@ -307,6 +307,150 @@
 
 
 
+// import { useEffect, useState } from "react";
+// import { Grid, GridColumn } from "@progress/kendo-react-grid";
+// import { Button } from "@progress/kendo-react-buttons";
+// import { Dialog } from "@progress/kendo-react-dialogs";
+
+// import axios from "axios";
+// import GetStructure from "./GetStructure";
+
+// import { generateTree } from "./treeGenerator";
+// import TreeView from './TreeView'
+// import NodeTree from "./NodeTree";
+
+
+// function GetHierarchical() {
+//     const [structures, setStructures] = useState([]);
+//     const [skip, setSkip] = useState(0);
+//     const [take, setTake] = useState(5);
+
+//     const [showDialog, setShowDialog] = useState(false);
+//     const [selectedHierarchy, setSelectedHierarchy] = useState("");
+
+
+//     const [showTreeDialog, setShowTreeDialog] = useState(false);
+//     const [treeData, setTreeData] = useState([]);
+
+
+
+//     const fetchStructures = () => {
+//         axios
+//             .get("http://localhost:8081/structure/getHierarchical")
+//             .then((res) => {
+//                 setStructures(res.data);
+//                 console.log(res.data);
+//             })
+//             .catch((err) => console.log(err));
+//     };
+
+//     useEffect(() => {
+//         fetchStructures();
+//     }, []);
+
+
+
+//     const pageChange = (event) => {
+//         setSkip(event.page.skip);
+//         setTake(event.page.take);
+//     };
+
+//     const handleView = (dataItem) => {
+//         setSelectedHierarchy(dataItem.HierarchicalName);
+//         setShowDialog(true);
+//     }
+
+
+// const handleStructure = (dataItem) => {
+//     axios
+//         .get(
+//             `http://localhost:8081/structure/getStructure/${dataItem.HierarchicalName}`
+//         )
+//         .then((res) => {
+//             const tree = generateTree(res.data);
+            
+//             setTreeData(tree);
+
+//             setShowTreeDialog(true);
+//         })
+//         .catch(console.error);
+
+   
+// };
+
+
+
+
+
+
+
+
+
+
+//     const pagedData = structures.slice(skip, skip + take);
+
+
+
+
+
+//     return (
+
+//         <>
+//             <h1>Hierarchical</h1>
+//             <Grid
+//                 data={pagedData}
+//                 skip={skip}
+//                 take={take}
+//                 total={structures.length}
+//                 pageable={true}
+//                 onPageChange={pageChange}
+//             >
+//                 <GridColumn field="HierarchicalName" title="Hierarchical Name" />
+//                 <GridColumn field="description" title="Description" />
+//                 <GridColumn
+//                     title="Actions"
+//                     width="200px"
+//                     cell={(props) => (
+//                         <td>
+//                             <Button
+//                                 style={{ margin: "5px" }}
+//                                 onClick={() => handleView(props.dataItem)}
+//                             >
+//                                 View
+//                             </Button>
+
+//                             <Button  onClick={() => handleStructure(props.dataItem)}>
+//                                 Structure
+//                             </Button>
+//                         </td>
+//                     )}
+//                 />
+
+
+
+//             </Grid>
+//             {showDialog && (
+//                 <Dialog title="Structure Details" onClose={() => setShowDialog(false)}
+//                     width={800} >
+//                     <GetStructure hierarchicalName={selectedHierarchy} />
+//                 </Dialog>
+//             )}
+//             {showTreeDialog && (
+//     <Dialog
+//         title="Structure Tree"
+//         width={600}
+//         onClose={() => setShowTreeDialog(false)}
+//     >
+//         <TreeView data={treeData}   />
+//     </Dialog>
+// )}
+
+//         </>
+//     );
+// }
+
+// export default GetHierarchical;
+
 import { useEffect, useState } from "react";
 import { Grid, GridColumn } from "@progress/kendo-react-grid";
 import { Button } from "@progress/kendo-react-buttons";
@@ -371,6 +515,9 @@ const handleStructure = (dataItem) => {
             
             setTreeData(tree);
 
+        setSelectedHierarchy(dataItem.HierarchicalName);
+
+
             setShowTreeDialog(true);
         })
         .catch(console.error);
@@ -378,6 +525,32 @@ const handleStructure = (dataItem) => {
    
 };
 
+// const handleStructure = (dataItem) => {
+//     setSelectedHierarchy(dataItem.HierarchicalName);
+//     loadTree(dataItem.HierarchicalName);
+//     setShowTreeDialog(true);
+// };
+
+
+
+// const loadTree = (hierarchicalName) => {
+//     axios
+//         .get(`http://localhost:8081/structure/getStructure/${hierarchicalName}`)
+//         .then((res) => {
+//             // setTreeData(generateTree(res.data));
+//             // console.log("RAW DATA FROM BACKEND:", res.data);
+
+             
+
+//             const tree = generateTree(res.data);
+           
+
+//             // console.log("GENERATED TREE:", tree);
+
+//             setTreeData(tree);
+//         })
+//         .catch(console.error);
+// };
 
 
 
@@ -441,7 +614,7 @@ const handleStructure = (dataItem) => {
         width={600}
         onClose={() => setShowTreeDialog(false)}
     >
-        <TreeView data={treeData} />
+        <TreeView data={treeData}   hierarchicalName={selectedHierarchy}  />
     </Dialog>
 )}
 

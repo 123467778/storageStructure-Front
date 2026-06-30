@@ -2,6 +2,7 @@
 let id = 1;
 
 function createNodes(levels, currentLevel = 0, path = "") {
+    console.log(levels.length);
     // last node check with level length.,stop recu
     if (currentLevel >= levels.length) return []; 
 // data of current level i.e name and quants
@@ -10,9 +11,7 @@ function createNodes(levels, currentLevel = 0, path = "") {
 
     for (let i = 1; i <= current.quantity; i++) {
          //1 or 11 // 2 12
-        const currentPath =
-       
-            path === "" ? `${i}` : `${path}${i}`;
+        const currentPath = path === "" ? `${i}` : `${path}${i}`;
 
         nodes.push({
             id: id++,

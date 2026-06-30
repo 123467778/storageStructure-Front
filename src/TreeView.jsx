@@ -1,9 +1,9 @@
 import { useState } from "react";
 import NodeTree from "./NodeTree";
 
-export default function TreeView({ data }) {
+export default function TreeView({ data, hierarchicalName}) {
+    const[selectedNodeId ,setSelectedNodeId] = useState(null);
 
-    const[selectedNodeId ,setSelectedNodeId] = useState("");
 
 
     console.log("Data" ,JSON.stringify(data));
@@ -16,6 +16,11 @@ export default function TreeView({ data }) {
                 <NodeTree
                     key={node.id}
                     node={node}
+                        selectedNodeId={selectedNodeId}
+                    setSelectedNodeId={setSelectedNodeId}
+                     hierarchicalName={hierarchicalName} 
+                     
+                   
                 />
 
             ))}

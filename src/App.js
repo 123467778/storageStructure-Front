@@ -5,6 +5,7 @@ import DisplayCategory from './DisplayCategory';
 import AddStructure from './AddStructure';
 import GetHierarchical from './GetHierarchical';
 import GetStructure from './GetStructure';
+import StorageStructure from './StorageStructure';
 function App() {
 //   const data = [
 //   {
@@ -33,8 +34,9 @@ function App() {
    {/* <Tree data={data}/> */}
    {/* <DisplayCategory/>  */}
    {/* <AddStructure/> */}
-   <GetHierarchical/>
+   {/* <GetHierarchical/> */}
    {/* <GetStructure/> */}
+   <StorageStructure/>
    </>
   );
 }
