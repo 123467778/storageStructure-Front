@@ -5,6 +5,9 @@ import { Grid, GridColumn } from "@progress/kendo-react-grid";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Select from "react-select";
+import useStructureTree from "./useStructureTree";
+import { Dialog } from "@progress/kendo-react-dialogs";
+import TreeView from "./TreeView";
 
 function StructureMapping() {
     const [scontainername, setContainername] = useState("");
@@ -15,7 +18,11 @@ function StructureMapping() {
   const [skip, setSkip] = useState(0);
     const [take, setTake] = useState(5);
 
-    const [structure,setStructure]=useState([])
+    const [structure,setStructure]=useState([]);
+   
+ const {treeData,showTreeDialog,selectedHierarchy,handleStructure,setShowTreeDialog} = useStructureTree();
+
+ const [editDialog,setEditDialog] = useState(false);
 
 const styles = {
         overlay: {
@@ -78,6 +85,10 @@ const loadStructure = ()=>{
             scontainername,
             sdescription,
             nhierarchicalid: selected?.value,
+             nodedata: {
+            tree: treeData
+        }
+            
         };
 
         console.log(data);
@@ -110,6 +121,12 @@ const loadStructure = ()=>{
         setSkip(event.page.skip);
         setTake(event.page.take);
     };
+
+
+
+
+
+
 
 
     return (
@@ -196,12 +213,25 @@ const loadStructure = ()=>{
                         <td>
                             <Button
                                 style={{ margin: "5px" }}
+                                onClick={() => handleStructure(props.dataItem.shierarchicalname)
+    }
                               
                             >
                                 View
                             </Button>
 
-                            <Button>
+                           <Button
+                                onClick={async () => {
+                                    
+                                    setShowTreeDialog(false);
+
+                                    await handleStructure(
+                                        props.dataItem.shierarchicalname
+                                    );
+
+                                    setEditDialog(true);
+                                }}
+                            >
                                 Edit
                             </Button>
                         </td>
@@ -210,9 +240,33 @@ const loadStructure = ()=>{
 
 
 </Grid>
+ {showTreeDialog && (
+                <Dialog
+                    title="Structure Tree"
+                    width={600}
+                    onClose={() => setShowTreeDialog(false)}
+                >
+                    <TreeView
+                        data={treeData}
+                        hierarchicalName={selectedHierarchy}
+                        editable={false}
+                    />
+                </Dialog>
+            )}
 
-
-
+{editDialog && (
+                <Dialog
+                    title="Structure Tree"
+                    width={600}
+                    onClose={() => setEditDialog(false)}
+                >
+                    <TreeView
+                        data={treeData}
+                        hierarchicalName={selectedHierarchy}
+                        editable={true}
+                    />
+                </Dialog>
+            )}
         </>
     );
 }
