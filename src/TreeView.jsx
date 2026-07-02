@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState} from "react";
 import NodeTree from "./NodeTree";
 
 export default function TreeView({ data,hierarchicalName,editable}) {
@@ -6,6 +6,10 @@ export default function TreeView({ data,hierarchicalName,editable}) {
 
     console.log("Data" ,JSON.stringify(data));
         console.log("Data" ,data);
+
+ 
+
+
 
     return (
         <>
@@ -18,11 +22,9 @@ export default function TreeView({ data,hierarchicalName,editable}) {
                         selectedNodeId={selectedNodeId}
                     setSelectedNodeId={setSelectedNodeId}
                     //  hierarchicalName={hierarchicalName} 
-                     
                    
 
-                      selectedNodeId={selectedNodeId}
-                    setSelectedNodeId={setSelectedNodeId}
+                      
 
                     editable={editable}
                 />
@@ -37,27 +39,3 @@ export default function TreeView({ data,hierarchicalName,editable}) {
 
 
 
-
-// import { useState } from "react";
-// import NodeTree from "./NodeTree";
-
-// export default function TreeView({ data, hierarchicalName }) {
-//     const [selectedNodeId, setSelectedNodeId] = useState(null);
-
-//     console.log("Data", JSON.stringify(data));
-//     console.log("Data", data);
-
-//     return (
-//         <>
-//             {data.map((node) => (
-//                 <NodeTree
-//                     key={node.id}
-//                     node={node}
-//                     selectedNodeId={selectedNodeId}
-//                     setSelectedNodeId={setSelectedNodeId}
-//                     hierarchicalName={hierarchicalName}
-//                 />
-//             ))}
-//         </>
-//     );
-// }

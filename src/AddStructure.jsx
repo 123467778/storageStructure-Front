@@ -392,7 +392,7 @@ import axios from 'axios';
 import { Grid, GridColumn } from "@progress/kendo-react-grid";
 import { Button } from "@progress/kendo-react-buttons";
 import '@progress/kendo-theme-default/dist/all.css';
-function AddStructure ()  {
+function AddStructure ({ onClose })  {
   const [HierarchicalName, setHierarchicalName] = useState("");
   const [description , setDescription] = useState("");
 
@@ -525,7 +525,9 @@ const handleSave = async () => {
 
   return (
     <div style={{ padding: "20px" }}>
+        
       <h2>Add Storage Structure</h2>
+    
 
       <div style={{ marginBottom: "15px" }}>
         <label>

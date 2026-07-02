@@ -32,7 +32,8 @@ const useStructureTree = () => {
         showTreeDialog,
         selectedHierarchy,
         handleStructure,
-        setShowTreeDialog,
+        setShowTreeDialog
+        
     };
 };
 
