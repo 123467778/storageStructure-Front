@@ -9,24 +9,22 @@ import ControlPointIcon from '@mui/icons-material/ControlPoint';
 function StorageStructure(){
  
     const [view,setView] = useState("hierarchy");
-    const[showAddStructure,setShowAddStructure] = useState(false);
    
-    const handleAddStructure=()=>{
-        setShowAddStructure(true);
-    }
+   
+        const[showAddStructure,setShowAddStructure] = useState(false);
 
 
     return (
         <>
        
-        <Button onClick={handleAddStructure} ><ControlPointIcon/></Button>
+        
     
        <Button onClick={()=>setView("hierarchy")} style={{margin:"5px" ,padding:"5px"}}>
         Hierarchical
        </Button>
        <Button onClick={()=>setView("structureMap")} style={{margin:"10px"}}> Structure Mapping </Button>
 
-      
+    
 
        {
         view==="hierarchy" && <GetHierarchical/>
@@ -37,7 +35,7 @@ function StorageStructure(){
        }
 
 
-{showAddStructure && (
+{/* {showAddStructure && (
                 <Dialog
                     title="Structure Details"
                     width={800}
@@ -48,7 +46,7 @@ function StorageStructure(){
                         onClose={() => setShowAddStructure(false)}
                     />
                 </Dialog>
-            )}
+            )} */}
       
       
         </>

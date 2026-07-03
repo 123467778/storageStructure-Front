@@ -323,6 +323,28 @@ function StructureMapping() {
     const [selectedContainerName, setSelectedContainerName] = useState("");
 
 
+     const styles = {
+        overlay: {
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999
+        },
+        modal: {
+            background: "white",
+            padding: "20px",
+            borderRadius: "8px",
+            minWidth: "450px"
+        }
+    };
+
+
     useEffect(() => {
         axios
             .get("http://localhost:8081/structure/getHierarchical")
@@ -372,6 +394,20 @@ function StructureMapping() {
         setSelected(null);
     };
 
+
+   const handleEdit = ()=>{
+     const nodedata ={
+        
+     }
+   }
+
+
+
+
+
+
+
+
     const pagedData = structure.slice(skip, skip + take);
 
     const pageChange = (event) => {
@@ -400,24 +436,26 @@ function StructureMapping() {
 
             {isOpen && (
                 <div
-                    style={{
-                        position: "fixed",
-                        inset: 0,
-                        background: "rgba(0,0,0,0.5)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        zIndex: 9999
-                    }}
+                    style={
+                        // position: "fixed",
+                        // inset: 0,
+                        // background: "rgba(0,0,0,0.5)",
+                        // display: "flex",
+                        // alignItems: "center",
+                        // justifyContent: "center",
+                        // zIndex: 9999
+                       styles.overlay
+                    }
                     onClick={() => setIsOpen(false)}
                 >
                     <div
-                        style={{
-                            background: "white",
-                            padding: "20px",
-                            borderRadius: "8px",
-                            minWidth: "250x",
-                        }}
+                        style={
+                            // background: "white",
+                            // padding: "20px",
+                            // borderRadius: "8px",
+                            // minWidth: "450x",
+                            styles.modal
+                        }
                         onClick={(e) => e.stopPropagation()}
                     >
                         <Button onClick={() => setIsOpen(false)}>X</Button>
@@ -427,7 +465,7 @@ function StructureMapping() {
                             value={scontainername}
                             onChange={(e) => setContainername(e.target.value)}
                         />
-
+                     
                         <input
                             placeholder="Description"
                             value={sdescription}

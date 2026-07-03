@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Grid, GridColumn } from "@progress/kendo-react-grid";
 import { Button } from "@progress/kendo-react-buttons";
 import { Dialog } from "@progress/kendo-react-dialogs";
+import AddStructure from "./AddStructure";
 import axios from "axios";
 
 import GetStructure from "./GetStructure";
@@ -17,6 +18,11 @@ function GetHierarchical() {
     const [selectedHierarchyName, setSelectedHierarchyName] = useState("");
 
     const {treeData,showTreeDialog,selectedHierarchy,handleStructure,setShowTreeDialog} = useStructureTree();
+
+
+        const[showAddStructure,setShowAddStructure] = useState(false);
+
+
 
     useEffect(() => {
         axios
@@ -37,10 +43,23 @@ function GetHierarchical() {
 
     const pagedData = structures.slice(skip, skip + take);
 
+
+     const handleAddStructure=()=>{
+        setShowAddStructure(true);
+    }
+
     return (
         <>
-            <h1>Hierarchical</h1>
 
+            <div style={{display:"flex", justifyContent: "flex-end" ,padding:"20px"}} >
+            <button type="button" className="btn btn-light" onClick={handleAddStructure} >+</button>
+
+        </div>
+
+
+
+            <h1>Hierarchical</h1>
+              
             <Grid
                 data={pagedData}
                 skip={skip}
@@ -109,6 +128,20 @@ function GetHierarchical() {
                         hierarchicalName={selectedHierarchy}
                         editable={false}
                         
+                    />
+                </Dialog>
+            )}
+
+
+            {showAddStructure && (
+                <Dialog
+                    title="Structure Details"
+                    width={800}
+                    height={700}
+                    onClose={() => setShowAddStructure(false)}
+                >
+                    <AddStructure
+                        onClose={() => setShowAddStructure(false)}
                     />
                 </Dialog>
             )}

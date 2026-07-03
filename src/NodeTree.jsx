@@ -6,9 +6,13 @@ export default function NodeTree({
     selectedNodeId,
     setSelectedNodeId,
     hierarchicalName,
-    editable,   
+    editable,  
+    tree,setTree, 
+    editNode
 }) {
     const [open, setOpen] = useState(true);
+
+    
 
  const hasChildren = node.children && node.children.length > 0; 
 
@@ -19,7 +23,20 @@ export default function NodeTree({
     console.log("node",node);
   };
     
+  const editCurrentNode =()=>{
+
+    const newName = prompt("Enter new Name");
+
+    if(!newName){
+        return;
+    }
+
+     setTree(prev =>
+            editNode(prev, node.id, newName)
+        );
+
   
+  }
 
 
     return (
@@ -54,18 +71,18 @@ export default function NodeTree({
                 </span>
 
                 
-            </div>
+           
 
                     {selectedNodeId === node.id && editable && (
                    <button
-                        onClick={handleAdd}
+                        onClick={editCurrentNode}
                     >
-                        + 
+                        edit 
                     </button>
                 )}
  
 
-
+              </div>
 
             {open &&
                 hasChildren &&
@@ -73,9 +90,11 @@ export default function NodeTree({
                     <NodeTree
                         key={child.id}
                         node={child}
+                        tree={tree}
+                        setTree={setTree}
                         selectedNodeId={selectedNodeId}
                         setSelectedNodeId={setSelectedNodeId}
-                        
+                          editNode={editNode}
                         
                             editable={editable}
 
