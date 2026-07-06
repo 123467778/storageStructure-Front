@@ -1,88 +1,89 @@
 import { useState } from "react";
 import AllInboxIcon from "@mui/icons-material/AllInbox";
+import { Button } from "@progress/kendo-react-buttons";
+import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
+import axios from "axios";
 
 export default function NodeTree({
     node,
     selectedNodeId,
     setSelectedNodeId,
-    hierarchicalName,
-    editable,  
-    tree,setTree, 
-    editNode
+    editable,
+    tree,
+    setTree,
+    selectedContainerName,
+    editNode,
+    onEditNode
 }) {
     const [open, setOpen] = useState(true);
 
-    
+    const hasChildren = node.children && node.children.length > 0;
 
- const hasChildren = node.children && node.children.length > 0; 
+    const handleSelect = () => {
+        setSelectedNodeId(node.id);
+    };
 
+    const editCurrentNode = async (e) => {
+        e.stopPropagation();
 
-  
-  const handleAdd = ()=>{
-    alert("child added..");
-    console.log("node",node);
-  };
-    
-  const editCurrentNode =()=>{
+        const newName = prompt("Enter new Name");
+        if (!newName) return;
 
-    const newName = prompt("Enter new Name");
+        const updatedTree = editNode(tree, node.id, newName);
 
-    if(!newName){
-        return;
-    }
+        setTree(updatedTree);
+        onEditNode(node.id, newName);
 
-     setTree(prev =>
-            editNode(prev, node.id, newName)
-        );
+        if (!selectedContainerName) {
+    console.error("Container name missing");
+    return;
+}
 
-  
-  }
+        try {
+            await axios.put(
+                `http://localhost:8081/structure/editNode/${selectedContainerName}`,
+                {
+                    nodedata: {
+                        tree: updatedTree
+                    }
+                }
+            );
 
+            alert("Node updated successfully");
+        } catch (err) {
+            console.log(err);
+            alert("Update failed");
+        }
+    };
 
     return (
-        <div style={{ marginLeft: "20px" }}>
-
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={{ marginLeft: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
 
                 <span
-                    onClick={(e) => {
-                        // e.stopPropagation();
-                        if (hasChildren) setOpen(!open);
-                    }}
-                    style={{
-                        width: "20px",
-                        cursor: hasChildren ? "pointer" : "default"
-                    }}
+                    onClick={() => hasChildren && setOpen(!open)}
+                    style={{ cursor: hasChildren ? "pointer" : "default" }}
                 >
                     {hasChildren ? (open ? "▼" : "▶") : <AllInboxIcon />}
                 </span>
 
-                <span
-                    onClick={(e) => {
-                        setSelectedNodeId(node.id);
-                        console.log("Id",selectedNodeId);
-                    }}
-                    style={{
-                        cursor: "pointer",
-                        
-                    }}
-                >
+                <span onClick={handleSelect} style={{ cursor: "pointer" }}>
                     {node.name}
                 </span>
 
-                
-           
+                {selectedNodeId === node.id && editable && (
+                    <>
+                        <Button onClick={editCurrentNode}>
+                            <EditIcon />
+                        </Button>
 
-                    {selectedNodeId === node.id && editable && (
-                   <button
-                        onClick={editCurrentNode}
-                    >
-                        edit 
-                    </button>
+                        <Button onClick={(e) => e.stopPropagation()}>
+                            <AddIcon />
+                        </Button>
+                    </>
                 )}
- 
-
-              </div>
+            </div>
 
             {open &&
                 hasChildren &&
@@ -94,14 +95,19 @@ export default function NodeTree({
                         setTree={setTree}
                         selectedNodeId={selectedNodeId}
                         setSelectedNodeId={setSelectedNodeId}
-                          editNode={editNode}
-                        
-                            editable={editable}
-
+                        editable={editable}
+                        selectedContainerName={selectedContainerName}
+                        editNode={editNode}
+                        onEditNode={onEditNode}
                     />
                 ))}
-
         </div>
     );
 }
+
+
+
+
+
+
 

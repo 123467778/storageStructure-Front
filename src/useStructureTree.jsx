@@ -29,6 +29,7 @@ const useStructureTree = () => {
 
     return {
         treeData,
+        setTreeData,
         showTreeDialog,
         selectedHierarchy,
         handleStructure,

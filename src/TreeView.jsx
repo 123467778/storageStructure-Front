@@ -1,77 +1,66 @@
-import { useState} from "react";
+import { useEffect, useState } from "react";
 import NodeTree from "./NodeTree";
-import { useEffect } from "react";
 
-
-function updateTree (nodes,nodeId,callback){
-    return nodes.map((node)=>{
-        if(node.id===nodeId){
+function updateTree(nodes, nodeId, callback) {
+    return nodes.map((node) => {
+        if (node.id === nodeId) {
             return callback(node);
         }
-     
+
         return {
             ...node,
-            children:node.children ? updateTree (node.children ,nodeId,callback):[]
+            children: node.children
+                ? updateTree(node.children, nodeId, callback)
+                : []
         };
-        
-    })
-
-    
+    });
 }
 
-function editNode(nodes,nodeId,newName){
-    return updateTree(nodes,nodeId,(node)=>({
+export function editNode(nodes, nodeId, newName) {
+    return updateTree(nodes, nodeId, (node) => ({
         ...node,
-        name:newName
+        name: newName
     }));
 }
 
+ function TreeView({
+    data,
+    editable,
+    selectedContainerName
+}) {
+    const [tree, setTree] = useState([]);
+    const [selectedNodeId, setSelectedNodeId] = useState(null);
 
+    useEffect(() => {
+        setTree(data || []);
+    }, [data]);
 
-
-export default function TreeView({ data,hierarchicalName,editable}) {
-           
-    const[tree,setTree]=useState([]);
- 
-    const[selectedNodeId ,setSelectedNodeId] = useState(null);
-
-    console.log("Data" ,JSON.stringify(data));
-        console.log("Data" ,data);
-
-
-        useEffect(()=>{
-            setTree(data||[])
-        },[data]);
- 
-        
-
+    const handleEdit = (id, newName) => {
+        setTree((prev) => editNode(prev, id, newName));
+    };
 
     return (
-        <>
-
+        <div>
             {tree.map((node) => (
                 <NodeTree
                     key={node.id}
                     node={node}
-                      tree={tree}
-                      setTree={setTree}
-                        selectedNodeId={selectedNodeId}
+                    tree={tree}
+                    setTree={setTree}
+                    selectedNodeId={selectedNodeId}
                     setSelectedNodeId={setSelectedNodeId}
-                    //  hierarchicalName={hierarchicalName} 
-                   
-
-                      
-
                     editable={editable}
+                    selectedContainerName={selectedContainerName}
                     editNode={editNode}
+                    onEditNode={handleEdit}
                 />
-
             ))}
-
-            
-        </>
+        </div>
     );
 }
+
+export default TreeView;
+
 
 
 
