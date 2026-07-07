@@ -122,13 +122,21 @@ function GetHierarchical() {
                     width={600}
                     onClose={() => setShowTreeDialog(false)}
                 >
-                    <TreeView
-                        data={treeData}
-                       
-                        hierarchicalName={selectedHierarchy}
-                        editable={false}
-                        
-                    />
+                    <div
+                        style={{
+                            height: "400px",
+                            overflowY: "auto",
+                            overflowX: "auto",
+                            padding: "10px",
+                            border: "1px solid #ddd",
+                        }}
+                    >
+                        <TreeView
+                            data={treeData}
+                            hierarchicalName={selectedHierarchy}
+                            editable={false}
+                        />
+                    </div>
                 </Dialog>
             )}
 
