@@ -78,7 +78,38 @@ function StructureMapping() {
         label: item.HierarchicalName
     }));
 
+    // const handleSave = () => {
+
+    //     console.log("treeData before save:", treeData);
+
+    //     const data = {
+    //         scontainername,
+    //         sdescription,
+    //         nhierarchicalid: selected?.value,
+    //         nodedata: {
+    //             tree: treeData
+    //         }
+    //     };
+
+
+
+    //     axios.post("http://localhost:8081/structure/createMap", data)
+    //         .then(() => {
+    //             alert("Saved Successfully");
+    //             setIsOpen(false);
+    //             loadStructure();
+    //             console.log("Node data", data.nodedata);
+    //         })
+    //         .catch(err => console.log(err));
+
+    //     setContainername("");
+    //     setDescription("");
+    //     setSelected(null);
+    // };
+
+
     const handleSave = () => {
+
         const data = {
             scontainername,
             sdescription,
@@ -88,11 +119,18 @@ function StructureMapping() {
             }
         };
 
+        console.log("treeData:", treeData);
+        console.log("Payload:", JSON.stringify(data, null, 2));
+
+
+        console.log("Save Payload:", JSON.stringify(data, null, 2));
+
         axios.post("http://localhost:8081/structure/createMap", data)
             .then(() => {
                 alert("Saved Successfully");
                 setIsOpen(false);
                 loadStructure();
+                console.log("Node data saved:", data.nodedata);
             })
             .catch(err => console.log(err));
 
@@ -101,23 +139,46 @@ function StructureMapping() {
         setSelected(null);
     };
 
-    const normalizeTree = (data) => {
-        if (Array.isArray(data)) return data;
-        if (data && data.tree) return data.tree;
-        return [];
-    };
 
-    const loadTree = async (containerName, hierarchicalName) => {
 
-        setSelectedContainerName(containerName); 
+
+
+    // const normalizeTree = (data) => {
+    //     if (Array.isArray(data)) return data;
+    //     if (data && data.tree) return data.tree;
+    //     return [];
+    // };
+
+    // const loadTree = async (containerName, hierarchicalName) => {
+
+    //     setSelectedContainerName(containerName);
+
+    //     const res = await axios.get(
+    //         `http://localhost:8081/structure/getEditNode/${containerName}`
+    //     );
+
+    //     console.log("LoadTree", res.data);
+
+    //     setTreeData(res.data);
+    // };
+
+
+   const getTree = async (containerName) => {
+    try {
+        setSelectedContainerName(containerName);
 
         const res = await axios.get(
-            `http://localhost:8081/structure/getEditNode/${containerName}/${hierarchicalName}`
+            `http://localhost:8081/structure/getTree/${containerName}`
         );
 
-        const normalized = normalizeTree(res.data);
-        setTreeData(normalized);
-    };
+        console.log("Get Tree:", res.data);
+
+        setTreeData(res.data.tree);
+    } catch (err) {
+        console.error(err);
+    }
+};
+
 
     const pagedData = structure.slice(skip, skip + take);
 
@@ -126,7 +187,7 @@ function StructureMapping() {
         setTake(event.page.take);
     };
 
-  const nodeNaming = (nodes, containerName) => {
+    const nodeNaming = (nodes, containerName) => {
         return nodes.map(node => ({
             ...node,
             name: `${containerName}${node.name.replace(/\D/g, "")}`,
@@ -140,17 +201,18 @@ function StructureMapping() {
     };
 
 
-
+    console.log("treeData:", treeData);
+    console.log("displayTree:", getDisplayTree(selectedContainerName));
 
 
     return (
         <>
             <div style={{ display: "flex", justifyContent: "flex-end", padding: "10px" }}>
                 {/* <Button onClick={() => setIsOpen(true)}>Add</Button> */}
-                <Button onClick={() => setIsOpen(true)} style={{background:"white" ,cursor:"pointer" }}> <AddIcon style={{ color: "rgb(35, 122, 253)"}}></AddIcon></Button>
-              
+                <Button onClick={() => setIsOpen(true)} style={{ background: "white", cursor: "pointer" }}> <AddIcon style={{ color: "rgb(35, 122, 253)" }}></AddIcon></Button>
+
             </div>
- {isOpen && (
+            {isOpen && (
                 <div
                     style={styles.overlay}
                     onClick={() => setIsOpen(false)}
@@ -159,8 +221,8 @@ function StructureMapping() {
                         style={styles.modal}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div style={{display:"flex" ,justifyContent:"flex-end"}}>
-                            <Button onClick={() => setIsOpen(false)} style={{justifyContent:"end"}}>X</Button>
+                        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                            <Button onClick={() => setIsOpen(false)} style={{ justifyContent: "end" }}>X</Button>
                         </div>
 
                         <div className="mb-3">
@@ -199,7 +261,14 @@ function StructureMapping() {
                             <Select
                                 options={options}
                                 value={selected}
-                                onChange={setSelected}
+
+                                onChange={async (option) => {
+                                    setSelected(option);
+
+                                    if (option) {
+                                        await handleStructure(option.label);
+                                    }
+                                }}
                                 placeholder="Select HierarchicalName"
                                 isClearable
                             />
@@ -230,10 +299,8 @@ function StructureMapping() {
                             <Button
                                 style={{ margin: "5px" }}
                                 onClick={() => {
-                                    loadTree(
-                                        props.dataItem.scontainername,
-                                        props.dataItem.shierarchicalname
-                                    );
+                                
+                                    getTree(props.dataItem.scontainername)
                                     setShowTreeDialog(true);
                                 }}
                             >
@@ -242,10 +309,8 @@ function StructureMapping() {
 
                             <Button
                                 onClick={() => {
-                                    loadTree(
-                                        props.dataItem.scontainername,
-                                        props.dataItem.shierarchicalname
-                                    );
+                                  
+                                    getTree(props.dataItem.scontainername);
                                     setEditDialog(true);
                                 }}
                             >
@@ -265,10 +330,10 @@ function StructureMapping() {
                 >
                     <div style={{ maxHeight: "500px", overflowY: "auto" }}>
                         <TreeView
-                            data={treeData}
+                            data={getDisplayTree(selectedContainerName)}
                             editable={false}
                             selectedContainerName={selectedContainerName}
-                            // onEditNode={() => {}}
+                        // onEditNode={() => {}}
                         />
                     </div>
                 </Dialog>
@@ -282,9 +347,11 @@ function StructureMapping() {
                 >
                     <div style={{ maxHeight: "500px", overflowY: "auto" }}>
                         <TreeView
-                         data={treeData}
+                            data={getDisplayTree(selectedContainerName)}
                             editable={true}
                             selectedContainerName={selectedContainerName}
+                                onTreeChange={setTreeData}
+
                         />
                     </div>
                 </Dialog>
