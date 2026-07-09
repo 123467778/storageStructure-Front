@@ -111,6 +111,36 @@ export function editNode(nodes,nodeId,newName){
 }
 
 
+export function deleteNode(nodes,nodeId){
+    return  nodes.filter(node=>node.id!==nodeId).map(node=> ({
+        ...node , children:node.children ?  deleteNode(node.children,nodeId):[]
+    }));
+}
+
+export function addChildNode(nodes,parentId,child){
+    return nodes.map((node)=>{
+        if(node.id===parentId){
+            return {
+                ...node,
+                children:[...node.children,child]
+            };
+        }
+     
+        return {
+            ...node,
+            children:addChildNode(node.children || [] ,parentId,child)
+        };
+
+    });
+
+}
+
+
+
+
+
+
+
 
 function TreeView({
     data,
@@ -175,6 +205,10 @@ function TreeView({
                 selectedContainerName={selectedContainerName}
 
                 editNode={editNode}
+
+                deleteNode={deleteNode}
+
+                addChildNode={addChildNode}
 
             />
 

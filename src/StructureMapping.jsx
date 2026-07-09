@@ -115,7 +115,7 @@ function StructureMapping() {
             sdescription,
             nhierarchicalid: selected?.value,
             nodedata: {
-                tree: treeData
+                tree: getDisplayTree(scontainername)
             }
         };
 

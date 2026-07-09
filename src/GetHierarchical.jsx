@@ -17,10 +17,10 @@ function GetHierarchical() {
     const [showDialog, setShowDialog] = useState(false);
     const [selectedHierarchyName, setSelectedHierarchyName] = useState("");
 
-    const {treeData,showTreeDialog,selectedHierarchy,handleStructure,setShowTreeDialog} = useStructureTree();
+    const { treeData, showTreeDialog, selectedHierarchy, handleStructure, setShowTreeDialog } = useStructureTree();
 
 
-        const[showAddStructure,setShowAddStructure] = useState(false);
+    const [showAddStructure, setShowAddStructure] = useState(false);
 
 
 
@@ -30,6 +30,8 @@ function GetHierarchical() {
             .then((res) => setStructures(res.data))
             .catch(console.error);
     }, []);
+
+
 
     const pageChange = (event) => {
         setSkip(event.page.skip);
@@ -44,22 +46,22 @@ function GetHierarchical() {
     const pagedData = structures.slice(skip, skip + take);
 
 
-     const handleAddStructure=()=>{
+    const handleAddStructure = () => {
         setShowAddStructure(true);
     }
 
     return (
         <>
 
-            <div style={{display:"flex", justifyContent: "flex-end" ,padding:"20px"}} >
-            <button type="button" className="btn btn-light" onClick={handleAddStructure} >+</button>
+            <div style={{ display: "flex", justifyContent: "flex-end", padding: "20px" }} >
+                <button type="button" className="btn btn-light" onClick={handleAddStructure} >+</button>
 
-        </div>
+            </div>
 
 
 
             <h1>Hierarchical</h1>
-              
+
             <Grid
                 data={pagedData}
                 skip={skip}
@@ -91,8 +93,11 @@ function GetHierarchical() {
                             </Button>
 
                             <Button
-                                onClick={() =>
+                            
+                                onClick={ () =>
+                                         
                                     handleStructure(
+
                                         props.dataItem.HierarchicalName
                                     )
                                 }

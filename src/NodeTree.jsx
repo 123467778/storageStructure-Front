@@ -126,15 +126,17 @@ import GridViewIcon from "@mui/icons-material/GridView";
 import ScienceIcon from "@mui/icons-material/Science";
 import BiotechIcon from "@mui/icons-material/Biotech";
 import KitchenIcon from "@mui/icons-material/Kitchen";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from '@mui/icons-material/Add';
 
 
 export default function NodeTree({
-    node, tree, setTree, selectedNodeId, setSelectedNodeId, editable, selectedContainerName, editNode
+    node, tree, setTree, selectedNodeId, setSelectedNodeId, editable, selectedContainerName, editNode,deleteNode,addChildNode
 
 }) {
 
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(true);
 
 
     const [isEditing, setIsEditing] = useState(false);
@@ -144,14 +146,14 @@ export default function NodeTree({
 
 
     const iconMap = {
-        warehouse: <WarehouseIcon />,
-        rack: <ShelvesIcon />,
-        box: <Inventory2Icon />,
-        shelf: <ViewModuleIcon />,
-        tray: <GridViewIcon />,
-        sample: <ScienceIcon />,
-        tube: <BiotechIcon />,
-        freezer: <KitchenIcon />
+        warehouse: <WarehouseIcon  fontSize="small"/>,
+        rack: <ShelvesIcon  fontSize="small" />,
+        box: <Inventory2Icon   fontSize="small"/>,
+        shelf: <ViewModuleIcon  fontSize="small"/>,
+        tray: <GridViewIcon  fontSize="small"/>,
+        sample: <ScienceIcon  fontSize="small"/>,
+        tube: <BiotechIcon  fontSize="small"/>,
+        freezer: <KitchenIcon  fontSize="small" />
     };
 
 
@@ -236,6 +238,127 @@ export default function NodeTree({
     }
 
 
+
+
+
+  const handleDelete =async(e)=>{
+      e.stopPropagation();
+      const updatedTree = deleteNode(tree,node.id);
+      setTree(updatedTree);
+
+
+      try{
+        await axios.put(`http://localhost:8081/structure/editNode/${selectedContainerName}`,
+            {
+
+               nodedata :{
+                tree:updatedTree
+               }
+
+        });
+        
+      }
+       catch(err){
+    console.log(err);
+    alert("Delete failed...");
+  }
+
+  }
+ 
+
+
+const handleAddChild = async (e)=>{
+
+    e.stopPropagation();
+
+
+    let childName;
+
+    let childIcon;
+
+
+
+    if(node.children && node.children.length > 0){
+
+
+        const lastChild =
+            node.children[node.children.length - 1];
+
+
+        childIcon = lastChild.icon;
+
+
+        const number =
+            parseInt(
+                lastChild.name.match(/\d+$/)[0],
+                10
+            );
+
+
+        childName =
+            `${childIcon} ${number+1}`;
+
+
+    }
+    
+    else {
+
+    childIcon = <i className="bi bi-box-seam" />;
+
+    
+    const parentNumber = node.name.match(/\d+$/)?.[0] || "";
+
+    
+    childName = `${childIcon} ${parentNumber}+1`;
+
+}
+
+
+
+    const child={
+
+
+        name:childName,
+
+        icon:childIcon,
+
+        children:[]
+
+    };
+
+
+
+    const updatedTree =
+        addChildNode(
+            tree,
+            node.id,
+            child
+        );
+
+
+
+    setTree(updatedTree);
+
+
+
+    await axios.put(
+
+        `http://localhost:8081/structure/editNode/${selectedContainerName}`,
+
+        {
+            nodedata:{
+                tree:updatedTree
+            }
+        }
+
+    );
+
+};
+
+
+
+
+
     return (
 
         <div style={{ marginLeft: 20 }}>
@@ -249,6 +372,11 @@ export default function NodeTree({
                     fontFamily: "IBM Plex Mono, monospace",
                     fontSize: "17px"
                 }} >
+
+
+
+
+
                 {/* <span
                     onClick={() =>
                         hasChildren && setOpen(!open)
@@ -293,15 +421,9 @@ export default function NodeTree({
                 >
                     {
                         iconMap[node.icon] ||
-                        <i className="bi bi-box-seam" />
+                        <i className="bi bi-box-seam" fontSize="small" />
                     }
                 </span>
-
-
-             
-
-                  
-
 
 
                 {
@@ -338,26 +460,6 @@ export default function NodeTree({
 
                             </Button>
 
-
-
-                            {/* <Button
-
-                    onClick={()=>{
-
-                        setIsEditing(false);
-
-                        setEditName(node.name);
-
-                    }}
-
-                >
-
-                    Cancel
-
-                </Button> */}
-
-
-
                         </>
 
                         :
@@ -365,7 +467,7 @@ export default function NodeTree({
 
                         <>
 
-                          
+
 
                             <span
                                 onClick={() => setSelectedNodeId(node.id)}
@@ -375,7 +477,7 @@ export default function NodeTree({
                                     gap: "8px"
                                 }}
                             >
-                               
+
                                 {node.name}
                             </span>
 
@@ -385,23 +487,24 @@ export default function NodeTree({
                                 editable
                                 &&
 
+                              <>
                                 <Button
-
                                     onClick={(e) => {
 
                                         e.stopPropagation();
                                         setIsEditing(true);
 
                                     }}
-
-                                    onBlur={handleEditBlur}
-
                                 >
-
-                                    <EditIcon fontSize="small"/>
-
+                                     <EditIcon fontSize="small" />
+                                    
                                 </Button>
 
+                                <Button onClick={handleDelete}><DeleteIcon  fontSize="small"/></Button>
+
+                                <Button onClick={handleAddChild}><AddIcon fontSize="small"/></Button>
+
+                              </>
                             }
 
                         </>
@@ -437,6 +540,10 @@ export default function NodeTree({
                         selectedContainerName={selectedContainerName}
 
                         editNode={editNode}
+
+                        deleteNode={deleteNode}
+
+                        addChildNode={addChildNode}
 
                     />
 
