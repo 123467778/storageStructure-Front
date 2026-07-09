@@ -16,6 +16,8 @@ function createNodes(levels, currentLevel = 0, path = "") {
         nodes.push({
             id: id++,
             name: `${current.nodeName} ${currentPath}`,
+               icon: current.icon, 
+
             children: createNodes(levels, currentLevel + 1, currentPath)
         });
     }

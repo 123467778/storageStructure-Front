@@ -118,6 +118,14 @@ import axios from "axios";
 
 import { Button } from "@progress/kendo-react-buttons";
 import EditIcon from "@mui/icons-material/Edit";
+import WarehouseIcon from "@mui/icons-material/Warehouse";
+import ShelvesIcon from "@mui/icons-material/Shelves";
+import Inventory2Icon from "@mui/icons-material/Inventory2";
+import ViewModuleIcon from "@mui/icons-material/ViewModule";
+import GridViewIcon from "@mui/icons-material/GridView";
+import ScienceIcon from "@mui/icons-material/Science";
+import BiotechIcon from "@mui/icons-material/Biotech";
+import KitchenIcon from "@mui/icons-material/Kitchen";
 
 
 export default function NodeTree({
@@ -126,13 +134,25 @@ export default function NodeTree({
 }) {
 
 
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
 
 
     const [isEditing, setIsEditing] = useState(false);
 
 
     const [editName, setEditName] = useState(node.name);
+
+
+    const iconMap = {
+        warehouse: <WarehouseIcon />,
+        rack: <ShelvesIcon />,
+        box: <Inventory2Icon />,
+        shelf: <ViewModuleIcon />,
+        tray: <GridViewIcon />,
+        sample: <ScienceIcon />,
+        tube: <BiotechIcon />,
+        freezer: <KitchenIcon />
+    };
 
 
 
@@ -165,8 +185,6 @@ export default function NodeTree({
         }
 
 
-
-
         try {
 
 
@@ -181,9 +199,6 @@ export default function NodeTree({
                 }
 
             );
-
-
-
 
             const res = await axios.get(
 
@@ -208,13 +223,13 @@ export default function NodeTree({
             setIsEditing(false);
             return;
         }
-       
+
     }
 
 
-    const handleEditBlur = ()=>{
-         
-        if(selectedNodeId){
+    const handleEditBlur = () => {
+
+        if (selectedNodeId) {
             setSelectedNodeId(null);
             return;
         }
@@ -234,7 +249,7 @@ export default function NodeTree({
                     fontFamily: "IBM Plex Mono, monospace",
                     fontSize: "17px"
                 }} >
-                <span
+                {/* <span
                     onClick={() =>
                         hasChildren && setOpen(!open)
                     }
@@ -265,7 +280,29 @@ export default function NodeTree({
                     }
 
 
+                </span> */}
+
+
+                <span
+                    onClick={() => hasChildren && setOpen(!open)}
+                    style={{
+                        cursor: hasChildren ? "pointer" : "default",
+                        display: "flex",
+                        alignItems: "center"
+                    }}
+                >
+                    {
+                        iconMap[node.icon] ||
+                        <i className="bi bi-box-seam" />
+                    }
                 </span>
+
+
+             
+
+                  
+
+
 
                 {
                     isEditing
@@ -328,16 +365,18 @@ export default function NodeTree({
 
                         <>
 
+                          
+
                             <span
-
-                                onClick={() =>
-                                    setSelectedNodeId(node.id)
-                                }
-
+                                onClick={() => setSelectedNodeId(node.id)}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "8px"
+                                }}
                             >
-
+                               
                                 {node.name}
-
                             </span>
 
                             {
@@ -359,7 +398,7 @@ export default function NodeTree({
 
                                 >
 
-                                    <EditIcon />
+                                    <EditIcon fontSize="small"/>
 
                                 </Button>
 

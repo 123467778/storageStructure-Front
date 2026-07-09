@@ -3,7 +3,7 @@
 // function AddStructure() {
 //     const [structure, setStructure] = useState([]);
 //     const handleSubmit = (e)=>{
-       
+
 //             console.log(structure);
 
 //     }
@@ -15,7 +15,7 @@
 //         </div> */}  
 //         {/* <h2>Structure Hiearchical </h2>
 //             <div className="row">
-                
+
 //                 <div className="col">
 //                     <label style={{margin:"8px"}}>Structure Hiearchical : </label>
 //                     <input type="text" className="htmlForm-control" placeholder="Structure name" style={{width:"450px" ,margin:"10px"}} value={structure} onChange={(e)=>setStructure(e.target.value)} />
@@ -145,7 +145,7 @@
 //          <h2>Structure Hierarchical</h2>
 //          <div style={{margin:"10px" }}>
 //             <label>Structure Name</label>
-                
+
 
 //                 <input
 //                         type="text" 
@@ -159,11 +159,11 @@
 
 
 
-           
+
 
 //             <div className="row mb-3">
 //                 <div className="col">
-                
+
 //                     <label>Structure Hierarchical :</label>
 
 //                     <input
@@ -202,7 +202,7 @@
 //                     field="structureNode"
 //                     title="StructureNode"
 //                 />
-               
+
 //             </Grid>
 //         </>
 //     );
@@ -222,7 +222,7 @@
 
 
 // const initialState = {
-   
+
 //   "structureName": "",
 //   "category_code": "",
 //   "data": {
@@ -268,10 +268,10 @@
 //             }
 //         case "RESET":
 //             return initialState;
-        
+
 //         default:
 //             return state;
-            
+
 //     }
 
 // }
@@ -301,11 +301,11 @@
 
 //     const handleSubmit = async (e)=>{
 //         e.preventDefault();
-       
+
 
 //         try{
 //            await axios.post("http://localhost:8081/create",state)
-          
+
 //         console.log(state);
 //            alert("Structure Created....");
 //            dispatch({type:"RESET"});
@@ -380,21 +380,31 @@
 //     Submit
 //   </button>
 // </form>
-   
-   
+
+
 //    </>
 //     );
 // }
 // export default AddStructure ;
 
 import React, { useState, useMemo } from "react";
+import Select from "react-select";
+
 import axios from 'axios';
 import { Grid, GridColumn } from "@progress/kendo-react-grid";
 import { Button } from "@progress/kendo-react-buttons";
 import '@progress/kendo-theme-default/dist/all.css';
-function AddStructure ({ onClose })  {
+import WarehouseIcon from "@mui/icons-material/Warehouse";
+import ShelvesIcon from "@mui/icons-material/Shelves";
+import Inventory2Icon from "@mui/icons-material/Inventory2";
+import ViewModuleIcon from "@mui/icons-material/ViewModule";
+import GridViewIcon from "@mui/icons-material/GridView";
+import ScienceIcon from "@mui/icons-material/Science";
+import BiotechIcon from "@mui/icons-material/Biotech";
+import KitchenIcon from "@mui/icons-material/Kitchen"
+function AddStructure({ onClose }) {
   const [HierarchicalName, setHierarchicalName] = useState("");
-  const [description , setDescription] = useState("");
+  const [description, setDescription] = useState("");
 
 
   const [node, setNode] = useState({
@@ -403,13 +413,14 @@ function AddStructure ({ onClose })  {
     quantity: "",
     isLeaf: false,
     rows: "",
-    columns: ""
+    columns: "",
+    icon: null
   });
 
 
   const [levels, setLevels] = useState([]);
 
- 
+
 
   const resetForm = () => {
     setNode({
@@ -418,7 +429,8 @@ function AddStructure ({ onClose })  {
       quantity: "",
       isLeaf: false,
       rows: "",
-      columns: ""
+      columns: "",
+      icon: null
     });
   };
 
@@ -433,7 +445,7 @@ function AddStructure ({ onClose })  {
       return;
     }
 
-   
+
     const newNode = {
       id: Date.now(),
       level: levels.length + 1,
@@ -442,7 +454,9 @@ function AddStructure ({ onClose })  {
       quantity: Number(node.quantity),
       isLeaf: node.isLeaf,
       rows: node.isLeaf ? Number(node.rows) : null,
-      columns: node.isLeaf ? Number(node.columns) : null
+      columns: node.isLeaf ? Number(node.columns) : null,
+      icon: node.icon?.value,
+      iconLabel: node.icon?.label
     };
 
     setLevels([...levels, newNode]);
@@ -450,88 +464,141 @@ function AddStructure ({ onClose })  {
     resetForm();
   };
 
- 
 
-const capacity = levels.reduce(
-  (acc, level) => acc * Number(level.quantity || 1),
-  1
-);
 
-const leafNode = levels.find((l) => l.isLeaf);
+  const capacity = levels.reduce(
+    (acc, level) => acc * Number(level.quantity || 1),
+    1
+  );
 
-const totalCapacity =
-  leafNode?.rows && leafNode?.columns
-    ? capacity *
+  const leafNode = levels.find((l) => l.isLeaf);
+
+  const totalCapacity =
+    leafNode?.rows && leafNode?.columns
+      ? capacity *
       Number(leafNode.rows) *
       Number(leafNode.columns)
-    : capacity;
+      : capacity;
 
 
 
-const handleSave = async () => {
-  if (!HierarchicalName.trim()) {
-    alert("hierarchical Name required");
-    return;
-  }
+  const handleSave = async () => {
+    if (!HierarchicalName.trim()) {
+      alert("hierarchical Name required");
+      return;
+    }
 
- 
 
-  if (levels.length === 0) {
-    alert("Add at least one node");
-    return;
-  }
 
-  const payload = {
-    HierarchicalName: HierarchicalName,
-    description: description,
-    data: {
-      levels: levels
+    if (levels.length === 0) {
+      alert("Add at least one node");
+      return;
+    }
+
+    const payload = {
+      HierarchicalName: HierarchicalName,
+      description: description,
+      data: {
+        levels: levels
+      }
+    };
+
+    console.log(
+      "Payload Sent To Backend:",
+      JSON.stringify(payload, null, 2)
+    );
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8081/structure/getNode",
+        payload
+      );
+      console.log(payload)
+      console.log(response.data);
+
+      alert("Structure Saved Successfully");
+
+      // Clear form after save
+      setHierarchicalName("");
+      setDescription("");
+      setLevels([]);
+
+      resetForm();
+
+    } catch (err) {
+      console.error(err);
+
+      if (err.response) {
+        console.log(err.response.data);
+        alert(err.response.data.message || "Save Failed");
+      } else {
+        alert("Something went wrong");
+      }
     }
   };
 
-  console.log(
-    "Payload Sent To Backend:",
-    JSON.stringify(payload, null, 2)
-  );
 
-  try {
-    const response = await axios.post(
-      "http://localhost:8081/structure/getNode",
-      payload
-    );
-   console.log(payload)
-    console.log(response.data);
 
-    alert("Structure Saved Successfully");
 
-    // Clear form after save
-    setHierarchicalName("");
-    setDescription("");
-    setLevels([]);
 
-    resetForm();
 
-  } catch (err) {
-    console.error(err);
-
-    if (err.response) {
-      console.log(err.response.data);
-      alert(err.response.data.message || "Save Failed");
-    } else {
-      alert("Something went wrong");
+  const options = [
+    {
+      value: "warehouse",
+      label: "Warehouse",
+      icon: <WarehouseIcon />
+    },
+    {
+      value: "rack",
+      label: "Rack",
+      icon: <ShelvesIcon />
+    },
+    {
+      value: "box",
+      label: "Box",
+      icon: <Inventory2Icon />
+    },
+    {
+      value: "shelf",
+      label: "Shelf",
+      icon: <ViewModuleIcon />
+    },
+    {
+      value: "tray",
+      label: "Tray",
+      icon: <GridViewIcon />
+    },
+    {
+      value: "sample",
+      label: "Sample",
+      icon: <ScienceIcon />
+    },
+    {
+      value: "tube",
+      label: "Tube",
+      icon: <BiotechIcon />
+    },
+    {
+      value: "Freezer",
+      label: "Freezer",
+      icon: <KitchenIcon />
     }
-  }
-};
+  ];
+
+
+
+
+
 
   return (
     <div style={{ padding: "20px" }}>
-        
+
       <h2>Add Storage Structure</h2>
-    
+
 
       <div style={{ marginBottom: "15px" }}>
         <label>
-           Hierarchical Name
+          Hierarchical Name
         </label>
         <br />
         <input
@@ -544,16 +611,16 @@ const handleSave = async () => {
       </div>
 
       <div style={{ marginBottom: "20px" }}>
-        <label> 
+        <label>
           Description
         </label>
         <br />
-         <textarea
-    value={description}
-    onChange={(e) => setDescription(e.target.value)}
-    rows={4}
-    cols={40}
-  />
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={4}
+          cols={40}
+        />
       </div>
 
       <hr />
@@ -572,47 +639,73 @@ const handleSave = async () => {
           placeholder="Node Name"
           value={node.nodeName}
           onChange={(e) =>
-  setNode(prev => ({
-    ...prev,
-    nodeName: e.target.value
-  }))
-}
+            setNode(prev => ({
+              ...prev,
+              nodeName: e.target.value
+            }))
+          }
         />
 
-        {/* <input
-          name="nodeCode"
-          placeholder="Node Code"
-          value={node.nodeCode}
-          onChange={handleChange}
-        /> */}
+       
 
         <input
           name="quantity"
           type="number"
           placeholder="Quantity"
           value={node.quantity}
-            onChange={(e) =>
-  setNode(prev => ({
-    ...prev,
-    quantity: e.target.value
-  }))
-}
+          onChange={(e) =>
+            setNode(prev => ({
+              ...prev,
+              quantity: e.target.value
+            }))
+          }
         />
 
-        <label>
+        {/* <label>
+            <input
+            type="checkbox"
+            name="isLeaf"
+            checked={node.isLeaf}
+            onChange={(e) =>
+              setNode(prev => ({
+                ...prev,
+                isLeaf: e.target.checked
+              }))
+            }
+          />
+          End Node
+        
+        </label> */}
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "5px"
+          }}
+        >
+          <label>
+            End Node
+          </label>
+
           <input
             type="checkbox"
             name="isLeaf"
             checked={node.isLeaf}
             onChange={(e) =>
-  setNode(prev => ({
-    ...prev,
-    isLeaf: e.target.checked
-  }))
-}
+              setNode(prev => ({
+                ...prev,
+                isLeaf: e.target.checked
+              }))
+            }
           />
-         End Node
-        </label>
+        </div>
+
+
+
+
+
 
         {node.isLeaf && (
           <>
@@ -622,11 +715,11 @@ const handleSave = async () => {
               placeholder="Rows"
               value={node.rows}
               onChange={(e) =>
-  setNode(prev => ({
-    ...prev,
-   rows: e.target.value
-  }))
-}
+                setNode(prev => ({
+                  ...prev,
+                  rows: e.target.value
+                }))
+              }
             />
 
             <input
@@ -634,18 +727,52 @@ const handleSave = async () => {
               type="number"
               placeholder="Columns"
               value={node.columns}
-             onChange={(e) =>
-  setNode(prev => ({
-    ...prev,
-    columns: e.target.value
-  }))
-}
+              onChange={(e) =>
+                setNode(prev => ({
+                  ...prev,
+                  columns: e.target.value
+                }))
+              }
             />
           </>
         )}
 
+
+        {/* <Select options={options} styles={{width:"300px"}}>
+
+ </Select> */}
+        <Select
+          options={options}
+          styles={{
+            container: (base) => ({
+              ...base,
+              width: "200px"
+            })
+          }}
+          formatOptionLabel={(option) => (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px"
+              }}
+            >
+              {option.icon}
+              <span>{option.label}</span>
+            </div>
+          )}
+          onChange={(selected) =>
+            setNode(prev => ({
+              ...prev,
+              icon: selected
+            }))
+          }
+          isClearable
+        />
+
+
         <Button onClick={addNode}>
-          Add Node
+          Add
         </Button>
       </div>
 
@@ -666,7 +793,7 @@ const handleSave = async () => {
           title="Node Name"
         />
 
-       
+
         <GridColumn
           field="quantity"
           title="Quantity"
@@ -687,7 +814,24 @@ const handleSave = async () => {
           title="Columns"
         />
 
-        
+
+        <GridColumn
+          title="Icon"
+          cell={(props) => {
+            const selectedIcon = options.find(
+              x => x.value === props.dataItem.icon
+            );
+
+            return (
+              <td>
+                {selectedIcon?.icon}
+              </td>
+            );
+          }}
+        />
+
+
+
       </Grid>
 
       <div
