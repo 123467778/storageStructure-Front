@@ -131,7 +131,7 @@ import AddIcon from '@mui/icons-material/Add';
 
 
 export default function NodeTree({
-    node, tree, setTree, selectedNodeId, setSelectedNodeId, editable, selectedContainerName, editNode,deleteNode,addChildNode
+    node, tree, setTree, selectedNodeId, setSelectedNodeId, editable, selectedContainerName, editNode, deleteNode, addChildNode
 
 }) {
 
@@ -142,18 +142,18 @@ export default function NodeTree({
     const [isEditing, setIsEditing] = useState(false);
 
 
-    const [editName, setEditName] = useState(node.name);
+    const [editName, setEditName] = useState(node.displayName||node.name);
 
 
     const iconMap = {
-        warehouse: <WarehouseIcon  fontSize="small"/>,
-        rack: <ShelvesIcon  fontSize="small" />,
-        box: <Inventory2Icon   fontSize="small"/>,
-        shelf: <ViewModuleIcon  fontSize="small"/>,
-        tray: <GridViewIcon  fontSize="small"/>,
-        sample: <ScienceIcon  fontSize="small"/>,
-        tube: <BiotechIcon  fontSize="small"/>,
-        freezer: <KitchenIcon  fontSize="small" />
+        warehouse: <WarehouseIcon fontSize="small" />,
+        rack: <ShelvesIcon fontSize="small" />,
+        box: <Inventory2Icon fontSize="small" />,
+        shelf: <ViewModuleIcon fontSize="small" />,
+        tray: <GridViewIcon fontSize="small" />,
+        sample: <ScienceIcon fontSize="small" />,
+        tube: <BiotechIcon fontSize="small" />,
+        freezer: <KitchenIcon fontSize="small" />
     };
 
 
@@ -211,9 +211,8 @@ export default function NodeTree({
         }
         catch (err) {
 
-            console.log(err);
-
-            alert("Update failed");
+          console.log(err);
+          alert("Update failed");
 
         }
 
@@ -221,7 +220,7 @@ export default function NodeTree({
 
 
     const handleBlur = () => {
-        if (editName.trim() === node.name) {
+        if (editName.trim() === node.displayName) {
             setIsEditing(false);
             return;
         }
@@ -241,123 +240,195 @@ export default function NodeTree({
 
 
 
-  const handleDelete =async(e)=>{
-      e.stopPropagation();
-      const updatedTree = deleteNode(tree,node.id);
-      setTree(updatedTree);
+    const handleDelete = async (e) => {
+        e.stopPropagation();
+        const updatedTree = deleteNode(tree, node.id);
+        setTree(updatedTree);
 
 
-      try{
-        await axios.put(`http://localhost:8081/structure/editNode/${selectedContainerName}`,
-            {
+        try {
+            await axios.put(`http://localhost:8081/structure/editNode/${selectedContainerName}`,
+                {
 
-               nodedata :{
-                tree:updatedTree
-               }
+                    nodedata: {
+                        tree: updatedTree
+                    }
 
-        });
-        
-      }
-       catch(err){
-    console.log(err);
-    alert("Delete failed...");
-  }
+                });
 
-  }
- 
-
-
-const handleAddChild = async (e)=>{
-
-    e.stopPropagation();
-
-
-    let childName;
-
-    let childIcon;
-
-
-
-    if(node.children && node.children.length > 0){
-
-
-        const lastChild =
-            node.children[node.children.length - 1];
-
-
-        childIcon = lastChild.icon;
-
-
-        const number =
-            parseInt(
-                lastChild.name.match(/\d+$/)[0],
-                10
-            );
-
-
-        childName =
-            `${childIcon} ${number+1}`;
-
-
-    }
-    
-    else {
-
-    childIcon = <i className="bi bi-box-seam" />;
-
-    
-    const parentNumber = node.name.match(/\d+$/)?.[0] || "";
-
-    
-    childName = `${childIcon} ${parentNumber}+1`;
-
-}
-
-
-
-    const child={
-
-
-        name:childName,
-
-        icon:childIcon,
-
-        children:[]
-
-    };
-
-
-
-    const updatedTree =
-        addChildNode(
-            tree,
-            node.id,
-            child
-        );
-
-
-
-    setTree(updatedTree);
-
-
-
-    await axios.put(
-
-        `http://localhost:8081/structure/editNode/${selectedContainerName}`,
-
-        {
-            nodedata:{
-                tree:updatedTree
-            }
+        }
+        catch (err) {
+            console.log(err);
+            alert("Delete failed...");
         }
 
-    );
-
-};
+    }
 
 
+// const handleAddChild = async (e) => {
+//     e.stopPropagation();
+
+//     const parentName = node.name;
+
+//     const parentNumber = parentName.match(/\d+$/)?.[0] || "";
+
+//     const prefix = parentName.replace(/\d+$/, "");
+
+//     let nextNumber;
+
+//     if (node.children && node.children.length > 0) {
+//         const lastChild = node.children[node.children.length - 1];
+//         const lastNumber =
+//             lastChild.name.match(/\d+$/)?.[0] || "";
+
+//         nextNumber = String(Number(lastNumber) + 1);
+//     } else {
+//         nextNumber = `${parentNumber}1`;
+//     }
+
+//     const child = {
+//         name: `${prefix}${nextNumber}`,
+//         displayName: `${prefix}${nextNumber}`,
+//         children: []
+//     };
+
+//     const updatedTree = addChildNode(tree, node.id, child);
+
+//     setTree(updatedTree);
+
+//     try {
+//         await axios.put(
+//             `http://localhost:8081/structure/editNode/${selectedContainerName}`,
+//             {
+//                 nodedata: {
+//                     tree: updatedTree
+//                 }
+//             }
+//         );
+//     } catch (err) {
+//         console.log(err);
+//         alert("Failed to add child");
+//     }
+// };
+
+//    const handleAddChild = async (e) => {
+//     e.stopPropagation();
+
+//     let childName = "";
+//     let childIcon = "";
 
 
+    
+//     if (node.children && node.children.length > 0) {
+
+//         childIcon = node.children[0].icon;
+
+//     } 
+//     else {
+
+        
+//         const currentLevel = node.level;
+
+//         childIcon =
+//             hierarchyLevels[currentLevel + 1]?.icon || "box";
+//     }
+
+
+//     let childNumber = "";
+
+
+//     if (node.children && node.children.length > 0) {
+
+//         const lastChild =
+//             node.children[node.children.length - 1];
+
+
+//         const lastNumber =
+//             lastChild.name.match(/\d+$/)?.[0] || "";
+
+
+//         childNumber =
+//             String(Number(lastNumber) + 1);
+
+//     }
+//     else {
+
+//         const parentNumber =
+//             node.name.match(/\d+$/)?.[0] || "";
+
+
+//         childNumber =
+//             `${parentNumber}1`;
+//     }
+
+
+//     const prefix =
+//         node.name.replace(/\d+$/, "");
+
+
+//     childName =
+//         `${prefix}${childNumber}`;
+
+
+//     const child = {
+
+
+//         icon: childIcon,
+
+//         name: childName,
+
+//         displayName: childName,
+
+//         level: (node.level || 0) + 1,
+
+//         children: []
+//     };
+
+
+//     const updatedTree =
+//         addChildNode(
+//             tree,
+//             node.id,
+//             child
+//         );
+
+
+//     setTree(updatedTree);
+
+
+//     try {
+
+//         await axios.put(
+//             `http://localhost:8081/structure/editNode/${selectedContainerName}`,
+//             {
+//                 nodedata: {
+//                     tree: updatedTree
+//                 }
+//             }
+//         );
+
+//     }
+//     catch(err){
+
+//         console.log(err);
+//         alert("Add child failed");
+
+//     }
+
+// };
+
+
+const handleAddChild = ()=>{
+    let childNode ="";
+
+    const childLen = node.children.length;
+    const lastNode = node.children[childLen-1];
+    console.log("Children Node" ,lastNode);
+
+
+
+
+}
 
     return (
 
@@ -478,7 +549,7 @@ const handleAddChild = async (e)=>{
                                 }}
                             >
 
-                                {node.name}
+                                {node.displayName || node.name}
                             </span>
 
                             {
@@ -487,24 +558,24 @@ const handleAddChild = async (e)=>{
                                 editable
                                 &&
 
-                              <>
-                                <Button
-                                    onClick={(e) => {
+                                <>
+                                    <Button
+                                        onClick={(e) => {
 
-                                        e.stopPropagation();
-                                        setIsEditing(true);
+                                            e.stopPropagation();
+                                            setIsEditing(true);
 
-                                    }}
-                                >
-                                     <EditIcon fontSize="small" />
-                                    
-                                </Button>
+                                        }}
+                                    >
+                                        <EditIcon fontSize="small" />
 
-                                <Button onClick={handleDelete}><DeleteIcon  fontSize="small"/></Button>
+                                    </Button>
 
-                                <Button onClick={handleAddChild}><AddIcon fontSize="small"/></Button>
+                                    <Button onClick={handleDelete}><DeleteIcon fontSize="small" /></Button>
 
-                              </>
+                                    <Button onClick={handleAddChild}><AddIcon fontSize="small" /></Button>
+
+                                </>
                             }
 
                         </>
@@ -535,9 +606,11 @@ const handleAddChild = async (e)=>{
 
                         setSelectedNodeId={setSelectedNodeId}
 
+
                         editable={editable}
 
                         selectedContainerName={selectedContainerName}
+
 
                         editNode={editNode}
 

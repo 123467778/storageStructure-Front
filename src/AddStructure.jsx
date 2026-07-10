@@ -409,6 +409,7 @@ function AddStructure({ onClose }) {
 
   const [node, setNode] = useState({
     nodeName: "",
+    displayName:"",
     // nodeCode: "",
     quantity: "",
     isLeaf: false,
@@ -425,7 +426,7 @@ function AddStructure({ onClose }) {
   const resetForm = () => {
     setNode({
       nodeName: "",
-      nodeCode: "",
+      displayName:"",
       quantity: "",
       isLeaf: false,
       rows: "",
@@ -447,10 +448,10 @@ function AddStructure({ onClose }) {
 
 
     const newNode = {
-      id: Date.now(),
       level: levels.length + 1,
       nodeName: node.nodeName,
       // nodeCode: node.nodeCode,
+      displayName:node.nodeName,
       quantity: Number(node.quantity),
       isLeaf: node.isLeaf,
       rows: node.isLeaf ? Number(node.rows) : null,
@@ -518,7 +519,6 @@ function AddStructure({ onClose }) {
 
       alert("Structure Saved Successfully");
 
-      // Clear form after save
       setHierarchicalName("");
       setDescription("");
       setLevels([]);

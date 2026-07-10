@@ -163,21 +163,21 @@ function StructureMapping() {
     // };
 
 
-   const getTree = async (containerName) => {
-    try {
-        setSelectedContainerName(containerName);
+    const getTree = async (containerName) => {
+        try {
+            setSelectedContainerName(containerName);
 
-        const res = await axios.get(
-            `http://localhost:8081/structure/getTree/${containerName}`
-        );
+            const res = await axios.get(
+                `http://localhost:8081/structure/getTree/${containerName}`
+            );
 
-        console.log("Get Tree:", res.data);
+            console.log("Get Tree:", res.data);
 
-        setTreeData(res.data.tree);
-    } catch (err) {
-        console.error(err);
-    }
-};
+            setTreeData(res.data.tree);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
 
     const pagedData = structure.slice(skip, skip + take);
@@ -187,13 +187,185 @@ function StructureMapping() {
         setTake(event.page.take);
     };
 
-    const nodeNaming = (nodes, containerName) => {
-        return nodes.map(node => ({
+    // const nodeNaming = (nodes, containerName) => {
+    //     return nodes.map(node => ({
+    //         ...node,
+    //          name: `${containerName}${node.name.replace(/\D/g, "")}`,
+    //         displayName: `${containerName}${node.name.replace(/\D/g, "")}`,
+
+    //         children: nodeNaming(node.children || [], containerName)
+    //     }));
+    // };
+
+
+
+    // const nodeNaming = (nodes, containerName) => {
+    //     return nodes.map(node => ({
+    //         ...node,
+
+    //         name: `${containerName}${node.name.replace(/\D/g, "")}`,
+
+    //         displayName: `${containerName}${node.name.replace(/\D/g, "")}`,
+
+    //         children: nodeNaming(
+    //             node.children || [],
+    //             containerName
+    //         )
+    //     }));
+    // };
+
+// const nodeNaming = (nodes, containerName) => {
+
+//     return nodes.map(node => {
+
+//         const CurrentName = node.nodeName || node.name;
+
+//         return {
+//             ...node,
+
+//             displayName: CurrentName,
+
+//             children: nodeNaming(
+//                 node.children || [],
+//                 containerName
+//             )
+//         };
+
+//     });
+
+// };
+
+
+// const nodeNaming = (nodes, containerName) => {
+
+//     return nodes.map(node => {
+
+//         const currentName =
+//             node.nodeName || node.name || "";
+
+
+//         const numberPart =
+//             currentName.match(/\d+$/)?.[0] || "";
+
+
+//         return {
+//             ...node,
+//             name:`${containerName}${numberPart}`,
+//             displayName:
+//                 `${containerName}${numberPart}`,
+
+//             children: nodeNaming(
+//                 node.children || [],
+//                 containerName
+//             )
+//         };
+
+//     });
+
+// };
+
+
+// const nodeNaming = (nodes, containerName) => {
+
+//     return nodes.map(node => {
+
+//         const currentName =
+//             node.nodeName || node.name || "";
+
+
+//         const numberPart =
+//             currentName.match(/\d+$/)?.[0] || "";
+
+
+//         const newName =
+//             `${containerName}${numberPart}`;
+
+
+//         return {
+//             ...node,
+
+//             name: newName,
+
+//             displayName: newName,
+
+//             children: nodeNaming(
+//                 node.children || [],
+//                 containerName
+//             )
+//         };
+
+//     });
+
+// };
+
+
+
+
+// const nodeNaming = (nodes, containerName) => {
+
+//     return nodes.map(node => {
+
+//         const currentName = node.name || "";
+
+//         // extract only numeric hierarchy
+//         const numberPart =
+//             currentName.match(/\d+/g)?.join("") || "";
+
+
+//         const newName =
+//             `${containerName}${numberPart}`;
+
+
+//         return {
+
+//             ...node,
+
+//             name: newName,
+
+//             displayName: newName,
+
+
+//             children: nodeNaming(
+//                 node.children || [],
+//                 containerName
+//             )
+//         };
+
+//     });
+
+// };
+
+
+
+
+const nodeNaming = (nodes, containerName) => {
+    return nodes.map(node => {
+
+        const currentName = node.name || "";
+
+        const numberPart =
+            currentName.replace(/^[^\d]+/, "");
+
+        const newName =
+            `${containerName}${numberPart}`;
+
+        return {
             ...node,
-            name: `${containerName}${node.name.replace(/\D/g, "")}`,
+            name: newName,
+            displayName: newName,
             children: nodeNaming(node.children || [], containerName)
-        }));
-    };
+        };
+    });
+};
+
+
+
+
+
+
+
+
+
 
     const getDisplayTree = (containerName) => {
         if (!containerName || !treeData.length) return treeData;
@@ -299,7 +471,7 @@ function StructureMapping() {
                             <Button
                                 style={{ margin: "5px" }}
                                 onClick={() => {
-                                
+
                                     getTree(props.dataItem.scontainername)
                                     setShowTreeDialog(true);
                                 }}
@@ -309,7 +481,7 @@ function StructureMapping() {
 
                             <Button
                                 onClick={() => {
-                                  
+
                                     getTree(props.dataItem.scontainername);
                                     setEditDialog(true);
                                 }}
@@ -330,7 +502,8 @@ function StructureMapping() {
                 >
                     <div style={{ maxHeight: "500px", overflowY: "auto" }}>
                         <TreeView
-                            data={getDisplayTree(selectedContainerName)}
+                            // data={getDisplayTree(selectedContainerName)}
+                            data={treeData}
                             editable={false}
                             selectedContainerName={selectedContainerName}
                         // onEditNode={() => {}}
@@ -347,10 +520,12 @@ function StructureMapping() {
                 >
                     <div style={{ maxHeight: "500px", overflowY: "auto" }}>
                         <TreeView
-                            data={getDisplayTree(selectedContainerName)}
+                            // data={getDisplayTree(selectedContainerName)}
+                                                        data={treeData}
+
                             editable={true}
                             selectedContainerName={selectedContainerName}
-                                onTreeChange={setTreeData}
+                            onTreeChange={setTreeData}
 
                         />
                     </div>

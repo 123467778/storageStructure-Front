@@ -104,17 +104,17 @@ export function editNode(nodes,nodeId,newName){
         nodeId,
         (node)=>({
             ...node,
-            name:newName
+          
+            displayName:newName
         })
     );
-
 }
-
 
 export function deleteNode(nodes,nodeId){
     return  nodes.filter(node=>node.id!==nodeId).map(node=> ({
         ...node , children:node.children ?  deleteNode(node.children,nodeId):[]
     }));
+
 }
 
 export function addChildNode(nodes,parentId,child){
@@ -134,10 +134,6 @@ export function addChildNode(nodes,parentId,child){
     });
 
 }
-
-
-
-
 
 
 
