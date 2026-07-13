@@ -18,6 +18,7 @@ function createNodes(levels, currentLevel = 0, path = "") {
             name: `${current.nodeName} ${currentPath}`,
             displayName:`${current.displayName} ${currentPath}`,
                icon: current.icon, 
+               isLeaf:current.isLeaf,
 
             children: createNodes(levels, currentLevel + 1, currentPath)
         });
@@ -33,6 +34,10 @@ export function generateTree(levels) {
     return createNodes(levels);
 }
 
+
+export function getNextId() {
+    return id++;
+}
 
 
 

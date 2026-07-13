@@ -78,37 +78,29 @@ function StructureMapping() {
         label: item.HierarchicalName
     }));
 
-    // const handleSave = () => {
-
-    //     console.log("treeData before save:", treeData);
-
-    //     const data = {
-    //         scontainername,
-    //         sdescription,
-    //         nhierarchicalid: selected?.value,
-    //         nodedata: {
-    //             tree: treeData
-    //         }
-    //     };
-
-
-
-    //     axios.post("http://localhost:8081/structure/createMap", data)
-    //         .then(() => {
-    //             alert("Saved Successfully");
-    //             setIsOpen(false);
-    //             loadStructure();
-    //             console.log("Node data", data.nodedata);
-    //         })
-    //         .catch(err => console.log(err));
-
-    //     setContainername("");
-    //     setDescription("");
-    //     setSelected(null);
-    // };
-
+   
 
     const handleSave = () => {
+
+       if(!scontainername){
+        alert("Container name is must");
+        return;
+        
+       }
+
+       if(!selected){
+        alert("select Hierarchical Name");
+       }
+
+
+       const isDuplicate = structure.some(
+        item => item.scontainername.toLowerCase() === scontainername.toLowerCase()
+    );
+
+    if (isDuplicate) {
+        alert("Container name already exists");
+        return;
+    }
 
         const data = {
             scontainername,
