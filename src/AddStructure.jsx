@@ -882,7 +882,12 @@ import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import GridViewIcon from "@mui/icons-material/GridView";
 import ScienceIcon from "@mui/icons-material/Science";
 import BiotechIcon from "@mui/icons-material/Biotech";
-import KitchenIcon from "@mui/icons-material/Kitchen"
+import KitchenIcon from "@mui/icons-material/Kitchen";
+
+
+
+
+
 function AddStructure({ onClose }) {
   const [HierarchicalName, setHierarchicalName] = useState("");
   const [description, setDescription] = useState("");

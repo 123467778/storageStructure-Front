@@ -277,6 +277,7 @@ export function addChildNode(nodes = [], parentId, child) {
 
         if (node.id === parentId) {
 
+            
             return {
                 ...node,
                 children: [...(node.children || []), child]

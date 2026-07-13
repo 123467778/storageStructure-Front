@@ -657,6 +657,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { getNextId } from "./treeGenerator";
 
 
+
 export default function NodeTree({
     node, tree, setTree, selectedNodeId, setSelectedNodeId, editable, selectedContainerName, editNode, deleteNode, addChildNode
 
@@ -966,6 +967,7 @@ export default function NodeTree({
 
 
     function cloneNode(node) {
+      
         return {
             id: getNextId()+1,
             name: node.name,
@@ -976,36 +978,102 @@ export default function NodeTree({
         };
     }
 
-    const handleClone = (e) => {
-        e.stopPropagation();
 
-        const cloned = cloneNode(node);
 
-        const updatedTree = [...tree, cloned];
-        setTree(updatedTree);
-   
+    // const handleClone = (e) => {
+    //     e.stopPropagation();
 
-        try {
+    //     const cloned = cloneNode(node);
 
-            axios.put(
-                `http://localhost:8081/structure/editNode/${selectedContainerName}`,
-                {
-                    nodedata: {
-                        tree: updatedTree
-                    }
-                }
-            );
+    //     const updatedTree = [...tree, cloned];
+    //     setTree(updatedTree);
 
-        } catch (err) {
+        
 
-            console.log(err);
-            alert("clone failed");
+    //     try {
 
+    //         axios.put(
+    //             `http://localhost:8081/structure/editNode/${selectedContainerName}`,
+    //             {
+    //                 nodedata: {
+    //                     tree: updatedTree
+    //                 }
+    //             }
+    //         );
+
+    //     } catch (err) {
+
+    //         console.log(err);
+    //         alert("clone failed");
+
+    //     }
+
+
+    // };
+
+    function findParent(tree, targetId, parent = null) {
+    for (const node of tree) {
+        if (node.id === targetId) {
+            return parent;
         }
 
+        if (node.children?.length) {
+            const result = findParent(node.children, targetId, node);
+            if (result) return result;
+        }
+    }
 
-    };
+    return null;
+}
 
+const addChildToParent = (nodes, parentId, child) => {
+    return nodes.map(node => {
+        if (node.id === parentId) {
+            return {
+                ...node,
+                children: [...(node.children || []), child]
+            };
+        }
+
+        if (node.children) {
+            return {
+                ...node,
+                children: addChildToParent(node.children, parentId, child)
+            };
+        }
+
+        return node;
+    });
+};
+
+const handleClone = (e) => {
+    e.stopPropagation();
+
+    const parent = findParent(tree, node.id);
+    const cloned = cloneNode(node);
+
+    let updatedTree;
+
+    if (parent) {
+        updatedTree = addChildToParent(tree, parent.id, cloned);
+    } else {
+        updatedTree = [...tree, cloned];
+    }
+
+    setTree(updatedTree);
+
+    axios.put(
+        `http://localhost:8081/structure/editNode/${selectedContainerName}`,
+        {
+            nodedata: {
+                tree: updatedTree
+            }
+        }
+    ).catch(err => {
+        console.log(err);
+        alert("clone failed");
+    });
+};
 
 
     return (

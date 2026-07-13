@@ -1,5 +1,7 @@
 
 let id = 1;
+const key = crypto.randomUUID();
+
 
 function createNodes(levels, currentLevel = 0, path = "") {
     console.log(levels.length);
@@ -19,6 +21,8 @@ function createNodes(levels, currentLevel = 0, path = "") {
             displayName:`${current.displayName} ${currentPath}`,
                icon: current.icon, 
                isLeaf:current.isLeaf,
+               key:key,
+
 
             children: createNodes(levels, currentLevel + 1, currentPath)
         });
