@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Grid, GridColumn } from "@progress/kendo-react-grid";
 import { Button } from "@progress/kendo-react-buttons";
+import AddIcon from "@mui/icons-material/Add"
 import { Dialog } from "@progress/kendo-react-dialogs";
 import AddStructure from "./AddStructure";
 import axios from "axios";
@@ -54,7 +55,9 @@ function GetHierarchical() {
         <>
 
             <div style={{ display: "flex", justifyContent: "flex-end", padding: "20px" }} >
-                <button type="button" className="btn btn-light" onClick={handleAddStructure} >+</button>
+                {/* <button type="button" className="btn btn-light" onClick={handleAddStructure} >+</button> */}
+                                <Button onClick={handleAddStructure} style={{ background: "white", cursor: "pointer" }}> <AddIcon style={{ color: "rgb(35, 122, 253)" }}></AddIcon></Button>
+
 
             </div>
 

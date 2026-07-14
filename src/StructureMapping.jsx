@@ -63,6 +63,8 @@ function StructureMapping() {
             .catch(err => console.log(err));
     }, []);
 
+    
+
     const loadStructure = () => {
         axios.get("http://localhost:8081/structure/getMap")
             .then(res => setStructure(res.data))

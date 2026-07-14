@@ -1011,6 +1011,9 @@ function AddStructure({ onClose }) {
 
       resetForm();
 
+          window.location.reload();
+
+
     } catch (err) {
       console.error(err);
 
@@ -1042,7 +1045,7 @@ function AddStructure({ onClose }) {
     {
       value: "box",
       label: "Box",
-      icon: <Inventory2Icon />
+      icon:  <i className="bi bi-box-seam" style={{ color: "#1976d2" }} />
     },
     {
       value: "shelf",
@@ -1070,7 +1073,6 @@ function AddStructure({ onClose }) {
       icon: <KitchenIcon />
     }
   ];
-
 
 
 
@@ -1219,6 +1221,7 @@ function AddStructure({ onClose }) {
 
            <Select
           options={options}
+
           styles={{
             container: (base) => ({
               ...base,
@@ -1245,13 +1248,7 @@ function AddStructure({ onClose }) {
           }
           isClearable
         />
-
-
         )
-
-
-
-
 
        }
         <Button onClick={addNode}>

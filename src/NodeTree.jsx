@@ -655,6 +655,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from '@mui/icons-material/Add';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { getNextId } from "./treeGenerator";
+import {uuidGeneration} from './treeGenerator'
 
 
 
@@ -935,6 +936,8 @@ export default function NodeTree({
             icon: ChildIcon,
 
             isLeaf: isLeaf,
+            
+            key:uuidGeneration(),
 
             children: []
         };
@@ -966,50 +969,41 @@ export default function NodeTree({
 
 
 
-    function cloneNode(node) {
-      
-        return {
-            id: getNextId()+1,
-            name: node.name,
-            displayName: node.displayName,
-            icon: node.icon,
-            isLeaf: node.isLeaf,
-            children: node.children?.map(cloneNode) || []
-        };
-    }
+
+
+function getNextNodeName(parent) {
+    const children = parent?.children || [];
+    const prefix = parent.name;
+
+    let max = 0;
+
+    children.forEach(child => {
+        const suffix = child.name.replace(prefix, "");
+        if (/^\d+$/.test(suffix)) {
+            max = Math.max(max, Number(suffix));
+        }
+    });
+
+    return `${prefix}${max + 1}`;
+}
 
 
 
-    // const handleClone = (e) => {
-    //     e.stopPropagation();
-
-    //     const cloned = cloneNode(node);
-
-    //     const updatedTree = [...tree, cloned];
-    //     setTree(updatedTree);
-
-        
-
-    //     try {
-
-    //         axios.put(
-    //             `http://localhost:8081/structure/editNode/${selectedContainerName}`,
-    //             {
-    //                 nodedata: {
-    //                     tree: updatedTree
-    //                 }
-    //             }
-    //         );
-
-    //     } catch (err) {
-
-    //         console.log(err);
-    //         alert("clone failed");
-
-    //     }
+function cloneNode(node, newName) {
+    return {
+        id: getNextId()+1,
+        name: newName,
+        displayName: newName,
+        icon: node.icon,
+        isLeaf: node.isLeaf,
+        key:uuidGeneration(),
+        children: node.children?.map((child, index) => 
+            cloneNode(child, `${newName}${index + 1}`)
+        ) || []
+    };
+}
 
 
-    // };
 
     function findParent(tree, targetId, parent = null) {
     for (const node of tree) {
@@ -1046,21 +1040,32 @@ const addChildToParent = (nodes, parentId, child) => {
     });
 };
 
+
 const handleClone = (e) => {
     e.stopPropagation();
 
     const parent = findParent(tree, node.id);
-    const cloned = cloneNode(node);
 
-    let updatedTree;
+    let cloned;
 
     if (parent) {
-        updatedTree = addChildToParent(tree, parent.id, cloned);
-    } else {
-        updatedTree = [...tree, cloned];
+        const newName = getNextNodeName(parent);
+        cloned = cloneNode(node, newName);
+     } 
+
+    else {
+        const nodename= node.name.replace(/\d+$/, '');
+        const newName = `${nodename}${tree.length + 1}`;
+        cloned = cloneNode(node, newName);
     }
 
+
+    const updatedTree = parent
+        ? addChildToParent(tree, parent.id, cloned)
+        : [...tree, cloned];
+
     setTree(updatedTree);
+
 
     axios.put(
         `http://localhost:8081/structure/editNode/${selectedContainerName}`,
