@@ -646,7 +646,7 @@
 //           }
 //         />
 
-       
+
 
 //         <input
 //           name="quantity"
@@ -674,7 +674,7 @@
 //             }
 //           />
 //           End Node
-        
+
 //         </label> */}
 
 //         <div
@@ -895,7 +895,7 @@ function AddStructure({ onClose }) {
 
   const [node, setNode] = useState({
     nodeName: "",
-    displayName:"",
+    displayName: "",
     // nodeCode: "",
     quantity: "",
     isLeaf: false,
@@ -912,7 +912,7 @@ function AddStructure({ onClose }) {
   const resetForm = () => {
     setNode({
       nodeName: "",
-      displayName:"",
+      displayName: "",
       quantity: "",
       isLeaf: false,
       rows: "",
@@ -937,7 +937,7 @@ function AddStructure({ onClose }) {
       level: levels.length + 1,
       nodeName: node.nodeName,
       // nodeCode: node.nodeCode,
-      displayName:node.nodeName,
+      displayName: node.nodeName,
       quantity: Number(node.quantity),
       isLeaf: node.isLeaf,
       rows: node.isLeaf ? Number(node.rows) : null,
@@ -1011,7 +1011,7 @@ function AddStructure({ onClose }) {
 
       resetForm();
 
-          window.location.reload();
+      window.location.reload();
 
 
     } catch (err) {
@@ -1045,7 +1045,7 @@ function AddStructure({ onClose }) {
     {
       value: "box",
       label: "Box",
-      icon:  <i className="bi bi-box-seam" style={{ color: "#1976d2" }} />
+      icon: <i className="bi bi-box-seam"  />
     },
     {
       value: "shelf",
@@ -1076,7 +1076,9 @@ function AddStructure({ onClose }) {
 
 
 
-
+  const boxOption = options.find(
+    (option) => option.value === "box"
+  );
 
   return (
     <div style={{ padding: "20px" }}>
@@ -1134,7 +1136,7 @@ function AddStructure({ onClose }) {
           }
         />
 
-       
+
 
         <input
           name="quantity"
@@ -1149,7 +1151,7 @@ function AddStructure({ onClose }) {
           }
         />
 
-        
+
 
         <div
           style={{
@@ -1215,42 +1217,44 @@ function AddStructure({ onClose }) {
         {/* <Select options={options} styles={{width:"300px"}}>
 
  </Select> */}
-       {
-        
-        !node.isLeaf && (
+        {
 
-           <Select
-          options={options}
 
-          styles={{
-            container: (base) => ({
-              ...base,
-              width: "200px"
-            })
-          }}
-          formatOptionLabel={(option) => (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px"
-              }}
-            >
-              {option.icon}
-              <span>{option.label}</span>
-            </div>
-          )}
-          onChange={(selected) =>
-            setNode(prev => ({
-              ...prev,
-              icon: selected
-            }))
-          }
-          isClearable
-        />
-        )
 
-       }
+          <Select
+            options={options}
+            value={node.isLeaf ? boxOption : node.icon}
+            isDisabled={node.isLeaf}
+
+            styles={{
+              container: (base) => ({
+                ...base,
+                width: "200px"
+              })
+            }}
+            formatOptionLabel={(option) => (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px"
+                }}
+              >
+                {option.icon}
+                <span>{option.label}</span>
+              </div>
+            )}
+            onChange={(selected) =>
+              setNode(prev => ({
+                ...prev,
+                icon: selected
+              }))
+            }
+            isClearable
+          />
+
+        }
+
         <Button onClick={addNode}>
           Add
         </Button>
