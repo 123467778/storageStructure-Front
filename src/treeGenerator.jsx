@@ -1,4 +1,3 @@
-
 let id = 1;
 // const key = crypto.randomUUID();
 export function uuidGeneration() {
@@ -44,11 +43,11 @@ export function generateTree(levels) {
     return createNodes(levels);
 }
 
-
 export function getNextId() {
+        console.log("from next Id" ,id);
+
     return id++;
 }
-
 
 
 
