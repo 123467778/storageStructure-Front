@@ -5,16 +5,12 @@ import AddStructure from './AddStructure';
 import GetHierarchical from './GetHierarchical';
 import GetStructure from './GetStructure';
 import StorageStructure from './StorageStructure';
+import SearchableList from './SearchableList';
 function App() {
 
 
   return (
    <>
-   {/* <Tree data={data}/> */}
-   {/* <DisplayCategory/>  */}
-   {/* <AddStructure/> */}
-   {/* <GetHierarchical/> */}
-   {/* <GetStructure/> */}
    <StorageStructure/>
    </>
   );

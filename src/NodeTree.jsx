@@ -15,8 +15,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from '@mui/icons-material/Add';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { getNextId } from "./treeGenerator";
-import {uuidGeneration} from './treeGenerator'
-
+import { uuidGeneration } from './treeGenerator';
+import { Tooltip } from "react-tooltip";
 
 
 export default function NodeTree({
@@ -28,6 +28,7 @@ export default function NodeTree({
     const [open, setOpen] = useState(true);
 
 
+
     const [isEditing, setIsEditing] = useState(false);
 
 
@@ -35,14 +36,15 @@ export default function NodeTree({
 
 
 
+
     const iconMap = {
-        warehouse: <WarehouseIcon fontSize="small"  color="primary"/>,
-        rack: <ShelvesIcon fontSize="small"  color="info"/>,
+        warehouse: <WarehouseIcon fontSize="small" color="primary" />,
+        rack: <ShelvesIcon fontSize="small" color="info" />,
         box: <i className="bi bi-box-seam" style={{ color: "#1976d2" }} />,
         shelf: <ViewModuleIcon fontSize="small" color="success" />,
-        tray: <GridViewIcon fontSize="small" color="error"/>,
+        tray: <GridViewIcon fontSize="small" color="error" />,
         sample: <ScienceIcon fontSize="small" color="warning" />,
-        tube: <BiotechIcon fontSize="small" color="action"/>,
+        tube: <BiotechIcon fontSize="small" color="action" />,
         freezer: <KitchenIcon fontSize="small" color="disabled" />
     };
 
@@ -53,7 +55,6 @@ export default function NodeTree({
         node.children.length > 0;
 
 
-
     const saveNode = async (e) => {
 
         e.stopPropagation();
@@ -61,7 +62,7 @@ export default function NodeTree({
 
         const updatedTree = editNode(tree, node.id, editName);
 
-       // setTree(updatedTree);
+        // setTree(updatedTree);
 
         setIsEditing(false);
 
@@ -154,6 +155,135 @@ export default function NodeTree({
     }
 
 
+    // const handleAddChild = async (e) => {
+
+    //     e.stopPropagation();
+
+    //     let childNode = "";
+    //     let childId = 0;
+    //     let ChildIcon = "";
+    //     let isLeaf = false;
+
+    //     if (node.children && node.children.length > 0) {
+
+    //         const childLen = node.children.length - 1;
+
+    //         console.log("Last Node", node.children[childLen]);
+
+    //         const lastNode = node.children[childLen];
+
+    //         // childId = lastNode.id + 1;
+    //         childId = getNextId();
+
+
+
+    //         console.log("Tree from node", tree);
+
+
+    //         let num = Number(lastNode.name.match(/\d+$/)?.[0]);
+
+    //         let incre = ++num;
+
+    //         console.log(incre);
+
+    //         childNode = lastNode.name.replace(/\d+$/, incre);
+
+    //         console.log(childNode);
+
+    //         ChildIcon = lastNode.icon;
+
+    //         isLeaf = lastNode.isLeaf;
+
+    //     }
+    //     else {
+
+    //         const parentNumber = node.name.match(/\d+$/)?.[0];
+
+    //         //  childId = node.id + 1;
+    //         childId = getNextId();
+
+
+    //         ChildIcon = "box";
+
+
+    //         isLeaf = true;
+
+    //         childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
+    //     }
+
+
+
+
+
+
+    //     const newChild = {
+
+    //         id: childId,
+
+    //         name: childNode,
+
+    //         displayName: childNode,
+
+    //         icon: ChildIcon,
+
+    //         isLeaf: isLeaf,
+
+    //         key: uuidGeneration(),
+
+    //         children: []
+    //     };
+
+    //     console.log("New Child", newChild);
+
+    //     const updatedTree = addChildNode(tree, node.id, newChild);
+
+    //     setTree(updatedTree);
+
+    //     try {
+
+    //         await axios.put(
+    //             `http://localhost:8081/structure/editNode/${selectedContainerName}`,
+    //             {
+    //                 nodedata: {
+    //                     tree: updatedTree
+    //                 }
+    //             }
+    //         );
+
+    //     } catch (err) {
+
+    //         console.log(err);
+    //         alert("Add Child Failed");
+
+    //     }
+    // };
+
+
+    function findReferenceChild(nodes, currentNode) {
+        for (const item of nodes) {
+
+            // Skip the current node
+            if (item.id === currentNode.id) {
+                // continue searching children
+            } else if (
+                item.icon === currentNode.icon &&
+                item.children &&
+                item.children.length > 0
+            ) {
+                // Found another node of the same type that already has children
+                return item.children[0];
+            }
+
+            if (item.children?.length) {
+                const result = findReferenceChild(item.children, currentNode);
+                if (result) {
+                    return result;
+                }
+            }
+        }
+
+        return null;
+    }
 
     const handleAddChild = async (e) => {
 
@@ -175,7 +305,7 @@ export default function NodeTree({
             // childId = lastNode.id + 1;
             childId = getNextId();
 
-            
+
 
             console.log("Tree from node", tree);
 
@@ -194,20 +324,60 @@ export default function NodeTree({
 
             isLeaf = lastNode.isLeaf;
 
-        } else {
+        }
+        // else {
+        //     const parentNumber = node.name.match(/\d+$/)?.[0];
+
+        //     childId = getNextId();
+
+        //     const parent = findParent(tree, node.id);
+
+        //     let sampleChild = null;
+
+        //     if (parent) {
+        //         const sibling = parent.children.find(
+        //             child => child.id !== node.id && child.children?.length > 0
+        //         );
+
+        //         if (sibling) {
+        //             sampleChild = sibling.children[0];
+        //         }
+
+
+        //     }
+
+        //     ChildIcon = sampleChild ? sampleChild.icon : null;
+        //     isLeaf = sampleChild ? sampleChild.isLeaf : true;
+
+        //     childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
+
+        // }
+
+        else {
 
             const parentNumber = node.name.match(/\d+$/)?.[0];
 
-            //  childId = node.id + 1;
             childId = getNextId();
 
+            // Find any node of the same type that already has children
+            const sampleChild = findReferenceChild(tree, node);
 
-            ChildIcon = "box";
-
-            isLeaf = true;
+            if (sampleChild) {
+                ChildIcon = sampleChild.icon;
+                isLeaf = sampleChild.isLeaf;
+            } else {
+                // No reference found
+                ChildIcon = null;
+                isLeaf = true;
+            }
 
             childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
         }
+
+
+
+
+
 
         const newChild = {
 
@@ -220,8 +390,8 @@ export default function NodeTree({
             icon: ChildIcon,
 
             isLeaf: isLeaf,
-            
-            key:uuidGeneration(),
+
+            key: uuidGeneration(),
 
             children: []
         };
@@ -252,120 +422,122 @@ export default function NodeTree({
     };
 
 
-function getNextNodeName(parent) {
-    const children = parent?.children || [];
-    const prefix = parent.name;
-
-    let max = 0;
-
-    children.forEach(child => {
-        const suffix = child.name.replace(prefix, "");
-        if (/^\d+$/.test(suffix)) {
-            max = Math.max(max, Number(suffix));
-        }
-    });
-
-    return `${prefix}${max + 1}`;
-}
 
 
 
-function cloneNode(node, newName) {
-    return {
-        id: getNextId(),
-        name: newName,
-        displayName: newName,
-        icon: node.icon,
-        isLeaf: node.isLeaf,
-        key:uuidGeneration(),
-        children: node.children?.map((child, index) => 
-            cloneNode(child, `${newName}${index + 1}`)
-        ) || []
-    };
-}
+    function getNextNodeName(parent) {
+        const children = parent?.children || [];
+        const prefix = parent.name;
+
+        let max = 0;
+
+        children.forEach(child => {
+            const suffix = child.name.replace(prefix, "");
+            if (/^\d+$/.test(suffix)) {
+                max = Math.max(max, Number(suffix));
+            }
+        });
+
+        return `${prefix}${max + 1}`;
+    }
+
+
+
+    function cloneNode(node, newName) {
+        return {
+            id: getNextId(),
+            name: newName,
+            displayName: newName,
+            icon: node.icon,
+            isLeaf: node.isLeaf,
+            key: uuidGeneration(),
+            children: node.children?.map((child, index) =>
+                cloneNode(child, `${newName}${index + 1}`)
+            ) || []
+        };
+    }
 
 
 
     function findParent(tree, targetId, parent = null) {
-    for (const node of tree) {
-        if (node.id === targetId) {
-            return parent;
-        }
+        for (const node of tree) {
+            if (node.id === targetId) {
+                return parent;
+            }
 
-        if (node.children?.length) {
-            const result = findParent(node.children, targetId, node);
-            if (result) return result;
-        }
-    }
-
-    return null;
-}
-
-const addChildToParent = (nodes, parentId, child) => {
-    return nodes.map(node => {
-        if (node.id === parentId) {
-            return {
-                ...node,
-                children: [...(node.children || []), child]
-            };
-        }
-
-        if (node.children) {
-            return {
-                ...node,
-                children: addChildToParent(node.children, parentId, child)
-            };
-        }
-
-        return node;
-    });
-};
-
-
-const handleClone = (e) => {
-    e.stopPropagation();
-
-    const parent = findParent(tree, node.id);
-
-    let cloned;
-
-    if (parent) {
-        const newName = getNextNodeName(parent);
-        cloned = cloneNode(node, newName);
-     } 
-
-    else {
-        const nodename= node.name.replace(/\d+$/, '');
-        const newName = `${nodename}${tree.length + 1}`;
-        cloned = cloneNode(node, newName);
-    }
-
-
-    const updatedTree = parent
-        ? addChildToParent(tree, parent.id, cloned)
-        : [...tree, cloned];
-
-    setTree(updatedTree);
-
-
-    axios.put(
-        `http://localhost:8081/structure/editNode/${selectedContainerName}`,
-        {
-            nodedata: {
-                tree: updatedTree
+            if (node.children?.length) {
+                const result = findParent(node.children, targetId, node);
+                if (result) return result;
             }
         }
-    ).catch(err => {
-        console.log(err);
-        alert("clone failed");
-    });
-};
+
+        return null;
+    }
+
+    const addChildToParent = (nodes, parentId, child) => {
+        return nodes.map(node => {
+            if (node.id === parentId) {
+                return {
+                    ...node,
+                    children: [...(node.children || []), child]
+                };
+            }
+
+            if (node.children) {
+                return {
+                    ...node,
+                    children: addChildToParent(node.children, parentId, child)
+                };
+            }
+
+            return node;
+        });
+    };
+
+
+    const handleClone = (e) => {
+        e.stopPropagation();
+
+        const parent = findParent(tree, node.id);
+
+        let cloned;
+
+        if (parent) {
+            const newName = getNextNodeName(parent);
+            cloned = cloneNode(node, newName);
+        }
+
+        else {
+            const nodename = node.name.replace(/\d+$/, '');
+            const newName = `${nodename}${tree.length + 1}`;
+            cloned = cloneNode(node, newName);
+        }
+
+
+        const updatedTree = parent
+            ? addChildToParent(tree, parent.id, cloned)
+            : [...tree, cloned];
+
+        setTree(updatedTree);
+
+
+        axios.put(
+            `http://localhost:8081/structure/editNode/${selectedContainerName}`,
+            {
+                nodedata: {
+                    tree: updatedTree
+                }
+            }
+        ).catch(err => {
+            console.log(err);
+            alert("clone failed");
+        });
+    };
 
 
     return (
 
         <div style={{ marginLeft: 20 }}>
-
 
             <div
                 style={{
@@ -376,10 +548,7 @@ const handleClone = (e) => {
                     fontSize: "17px"
                 }} >
 
-
-
-
-
+            
                 {/* <span
                     onClick={() =>
                         hasChildren && setOpen(!open)
@@ -422,10 +591,12 @@ const handleClone = (e) => {
                         alignItems: "center"
                     }}
 
+                    data-tooltip-id="common"
+                    data-tooltip-content={node.icon}
                 >
                     {
                         iconMap[node.icon] ||
-                        <i className="bi bi-box-seam" fontSize="small" style={{color:"#5582af"}} />
+                        <i className="bi bi-box-seam" fontSize="small" style={{ color: "#5582af" }} />
                     }
                 </span>
 
@@ -479,7 +650,12 @@ const handleClone = (e) => {
                                     display: "flex",
                                     alignItems: "center",
                                     gap: "8px",
-                                    cursor: "pointer"
+                                    cursor: "pointer",
+
+                                    // transition: "0.2s",
+                                    backgroundColor:
+                                        selectedNodeId === node.id ? "	#D0D0D0" : "transparent",
+
                                 }}
 
                             >
@@ -493,7 +669,7 @@ const handleClone = (e) => {
                                 editable
                                 &&
 
-                                <div style={{ display: "flex", flexDirection: "row", gap: "10px" }} >
+                                <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
                                     <Button
                                         onClick={(e) => {
 
@@ -502,28 +678,42 @@ const handleClone = (e) => {
                                             setIsEditing(true);
 
                                         }}
-                                        style={{border:"none"}}
+                                        style={{ border: "none" }}
+
+                                        data-tooltip-id="common"
+                                        data-tooltip-content={"Edit"}
+
                                     >
                                         <EditIcon fontSize="small" />
 
                                     </Button>
 
-                                    <Button onClick={handleDelete} style={{border:"none"}}><DeleteIcon fontSize="small"  /></Button>
+                                    <Button onClick={handleDelete} style={{ border: "none" }} data-tooltip-id="common"
+                                        data-tooltip-content={"Delete"}>
+
+
+                                        <DeleteIcon fontSize="small" /> </Button>
 
                                     {
                                         !node.isLeaf && (
 
-                                            <Button onClick={handleAddChild} style={{border:"none"}}><AddIcon /></Button>
+                                            <Button onClick={handleAddChild} style={{ border: "none" }} data-tooltip-id="common"
+                                                data-tooltip-content={"Add Child"}>
+
+
+                                                <AddIcon />
+
+
+                                            </Button>
                                         )
                                     }
 
 
-
-
-                                    <Button onClick={handleClone} style={{border:"none"}}><FileCopyIcon fontSize="small" /></Button>
-
+                                    <Button onClick={handleClone} style={{ border: "none" }} data-tooltip-id="common"
+                                        data-tooltip-content={"Clone Node"}><FileCopyIcon fontSize="small" /></Button>
                                 </div>
                             }
+
 
                         </>
 
@@ -572,7 +762,7 @@ const handleClone = (e) => {
 
             }
 
-
+            <Tooltip id="common" />
 
         </div>
 

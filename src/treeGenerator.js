@@ -14,7 +14,9 @@ function createNodes(levels, currentLevel = 0, path = "") {
     if (currentLevel >= levels.length) return []; 
 // data of current level i.e name and quants
     const current = levels[currentLevel];
+
     const nodes = [];
+
 
     for (let i = 1; i <= current.quantity; i++) {
          //1 or 11 // 2 12
