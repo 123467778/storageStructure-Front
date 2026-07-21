@@ -54,7 +54,7 @@ export default function NodeTree({
         tray: <GridViewIcon fontSize="small" color="error" />,
         sample: <ScienceIcon fontSize="small" color="warning" />,
         tube: <BiotechIcon fontSize="small" color="action" />,
-        freezer: <KitchenIcon fontSize="small" color="disabled" />
+        freezer: <KitchenIcon fontSize="small" color="primary" />
     };
 
 
@@ -758,7 +758,9 @@ export default function NodeTree({
                                 &&
 
                                 <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
-                                    <Button
+                                    {
+                                        selectedNodeId!==0 && (
+                                            <Button
                                         onClick={(e) => {
 
                                             e.stopPropagation();
@@ -775,9 +777,11 @@ export default function NodeTree({
                                         <EditIcon fontSize="small" />
 
                                     </Button>
+                                        )
+                                    }
 
                                     {
-                                        selectedNodeId !== 1 && (
+                                        selectedNodeId !== 0 && (
 
                                             <Button onClick={handleDelete} style={{ border: "none" }} data-tooltip-id="common"
                                                 data-tooltip-content={"Delete"}>
@@ -802,8 +806,12 @@ export default function NodeTree({
                                     }
 
 
-                                    <Button onClick={handleClone} style={{ border: "none" }} data-tooltip-id="common"
+                                 {
+                                    selectedNodeId!==0 && (
+                                           <Button onClick={handleClone} style={{ border: "none" }} data-tooltip-id="common"
                                         data-tooltip-content={"Clone Node"}><FileCopyIcon fontSize="small" /></Button>
+                                    )
+                                 }
                                 </div>
                             }
 

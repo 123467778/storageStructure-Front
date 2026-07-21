@@ -9,8 +9,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { Button } from "@progress/kendo-react-buttons";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import axios from 'axios';
-
-import useStructureTree from "./useStructureTree";
+import { generateTree } from "./treeGenerator";
  
 
 
@@ -239,7 +238,11 @@ function TreeView({
 
 const reset = async () => {
 
-    const tree = await handleStructure(selectedHierarchy);
+    const res = await axios.get(
+            `http://localhost:8081/structure/getStructure/${selectedHierarchy}`
+        );;
+    
+   const tree = generateTree(res.data);
 
     if (!tree) return;
 
@@ -311,12 +314,12 @@ const reset = async () => {
 
             </div> */}
 
-{
+{/* {
 
   editable && (
 
-<div style={{display:"flex", justifyContent:"flex-end",marginRight:"8px",position:"sticky" , top: 0,}}>
-        <Button onClick={reset}><RestartAltIcon fontSize="small"/></Button>
+   <div style={{display:"flex", justifyContent:"flex-end",marginRight:"8px",position:"sticky" , top: 0,} }>
+        <Button onClick={reset} data-tooltip-id="common" data-tooltip-content={"Reset structure"} ><RestartAltIcon fontSize="small"/></Button>
 
     
    </div> 
@@ -324,7 +327,7 @@ const reset = async () => {
 
 
 
-}
+} */}
 
             {/* <div style={{ padding:"8px", textAlign:"right" }}> */}
             <div style={{
@@ -340,7 +343,7 @@ const reset = async () => {
 
                 <input
                     type="text"
-                    placeholder="search"
+                    placeholder="  search"
                     value={search || ""}
                     onChange={(e) => {
                         setSearch(e.target.value);
@@ -349,18 +352,21 @@ const reset = async () => {
                     style={{
                         width: "200px",
                         height: "30px",
-                        marginRight:"10px"
+                        marginRight:"15px",
+                        border:"none",
+                        borderBottom:"2px solid #A9A9A9",
+
                     }}
                 />
 
 
                
-                    <Button onClick={previousMatch}>
+                    <Button onClick={previousMatch} data-tooltip-id="common" data-tooltip-content={"previous"}>
                         <ArrowUpwardIcon fontSize="small" />
                     </Button>
 
 
-                    <span style={{ padding: "6px" }}>
+                    <span style={{ padding: "8px" }}>
                         {
                             matches.length
                                 ?
@@ -371,9 +377,24 @@ const reset = async () => {
                     </span>
 
 
-                    <Button onClick={nextMatch}>
+                    <Button onClick={nextMatch} style={{marginRight:'10px'}} data-tooltip-id="common" data-tooltip-content={"next"}>
                         <ArrowDownwardIcon fontSize="small" />
                     </Button>
+
+                    {
+
+  editable && (
+
+  
+        <Button onClick={reset} data-tooltip-id="common" data-tooltip-content={"Reset structure"} ><RestartAltIcon fontSize="small"/></Button>
+
+    
+  
+      )
+
+
+
+}
                 
 
             </div>

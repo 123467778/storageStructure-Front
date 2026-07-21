@@ -6,6 +6,9 @@ import Select from "react-select";
 import useStructureTree from "./useStructureTree";
 import { Dialog } from "@progress/kendo-react-dialogs";
 import AddIcon from "@mui/icons-material/Add";
+import { uuidGeneration } from "./treeGenerator";
+
+
 
 import TreeView from "./TreeView";
 
@@ -27,7 +30,7 @@ function StructureMapping() {
     const {
         treeData,
         showTreeDialog,
-        selectedHierarchy,
+     
         handleStructure,
         setShowTreeDialog,
         setTreeData
@@ -36,6 +39,8 @@ function StructureMapping() {
 
     const [editDialog, setEditDialog] = useState(false);
     const [selectedContainerName, setSelectedContainerName] = useState("");
+
+    const[selectedHierarchy,setSelectedHierarchy] = useState("");
 
     const styles = {
         overlay: {
@@ -72,9 +77,13 @@ function StructureMapping() {
             .catch(err => console.log(err));
     };
 
+
     useEffect(() => {
         loadStructure();
     }, []);
+
+
+
 
     const options = hierarchicals.map(item => ({
         value: item.id,
@@ -104,6 +113,12 @@ function StructureMapping() {
         alert("Container name already exists");
         return;
     }
+
+   
+
+
+
+
 
         const data = {
             scontainername,
@@ -362,10 +377,30 @@ const nodeNaming = (nodes, containerName) => {
 
 
 
+    // const getDisplayTree = (containerName) => {
+    //     if (!containerName || !treeData.length) return treeData;
+    //     return nodeNaming(treeData, containerName);
+    // };
+
     const getDisplayTree = (containerName) => {
-        if (!containerName || !treeData.length) return treeData;
-        return nodeNaming(treeData, containerName);
-    };
+    if (!containerName || !treeData.length) {
+        return [];
+    }
+
+    const childNodes = nodeNaming(treeData, containerName);
+
+    return [
+        {
+            id: 0,
+            key:uuidGeneration(), // or uuidGeneration()
+            name: containerName,
+            displayName: containerName,
+            icon: "freezer",
+            isLeaf: false,
+            children: childNodes
+        }
+    ];
+};
 
 
     console.log("treeData:", treeData);
@@ -476,7 +511,7 @@ const nodeNaming = (nodes, containerName) => {
 
                             <Button
                                 onClick={() => {
-
+                                    setSelectedHierarchy(props.dataItem.shierarchicalname);
                                     getTree(props.dataItem.scontainername);
                                     setEditDialog(true);
                                 }}
