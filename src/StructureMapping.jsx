@@ -31,6 +31,7 @@ function StructureMapping() {
         handleStructure,
         setShowTreeDialog,
         setTreeData
+        
     } = useStructureTree();
 
     const [editDialog, setEditDialog] = useState(false);
@@ -520,6 +521,9 @@ const nodeNaming = (nodes, containerName) => {
                             editable={true}
                             selectedContainerName={selectedContainerName}
                             onTreeChange={setTreeData}
+                            selectedHierarchy={selectedHierarchy}
+                            handleStructure={handleStructure}
+
 
                         />
                     </div>

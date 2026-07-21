@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 
 import { Button } from "@progress/kendo-react-buttons";
@@ -17,10 +17,14 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { getNextId } from "./treeGenerator";
 import { uuidGeneration } from './treeGenerator';
 import { Tooltip } from "react-tooltip";
+import Highlight from "./Highlight";
+import Highlighter from "react-highlight-words";
+
 
 
 export default function NodeTree({
-    node, tree, setTree, selectedNodeId, setSelectedNodeId, editable, selectedContainerName, editNode, deleteNode, addChildNode
+    node, tree, setTree, selectedNodeId, setSelectedNodeId, editable, selectedContainerName, editNode, deleteNode, addChildNode, search, registerMatchRef, activeMatch, matches,
+    selectedHierarchy
 
 }) {
 
@@ -34,7 +38,12 @@ export default function NodeTree({
 
     const [editName, setEditName] = useState(node.displayName);
 
+    const nodeRef = useRef(null);
 
+
+    const matchIndex = matches
+        ? matches.indexOf(node.id)
+        : -1;
 
 
     const iconMap = {
@@ -53,6 +62,15 @@ export default function NodeTree({
     const hasChildren =
         node.children &&
         node.children.length > 0;
+
+
+
+
+
+
+
+
+
 
 
     const saveNode = async (e) => {
@@ -116,6 +134,10 @@ export default function NodeTree({
         }
 
     }
+
+
+
+
 
 
     const handleEditBlur = () => {
@@ -548,7 +570,7 @@ export default function NodeTree({
                     fontSize: "17px"
                 }} >
 
-            
+
                 {/* <span
                     onClick={() =>
                         hasChildren && setOpen(!open)
@@ -656,11 +678,77 @@ export default function NodeTree({
                                     backgroundColor:
                                         selectedNodeId === node.id ? "	#D0D0D0" : "transparent",
 
+
                                 }}
+
 
                             >
 
-                                {node.displayName || node.name}
+                                {/* {node.displayName || node.name} */}
+                                {/* <Highlight
+                                    text={node.displayName || node.name}
+                                    search={search}
+                                /> */}
+                                {/* <div>
+                                 <Highlighter
+                                    searchWords={[search]}
+                                    autoEscape={true}
+                                    textToHighlight={node.displayName || node.name}
+                                    highlightStyle={{
+                                        backgroundColor: "#DCDCDC",
+                                    }}
+
+                                    
+                                />
+                               </div> */}
+
+
+                                <div
+                                    ref={(element) => {
+
+                                        nodeRef.current = element;
+
+                                        const isMatch =
+                                            search &&
+                                            (node.displayName || node.name)
+                                                .toLowerCase()
+                                                .includes(search.toLowerCase());
+
+
+                                        if (isMatch && registerMatchRef) {
+
+                                            registerMatchRef(
+                                                node.id,
+                                                element
+                                            );
+
+                                        }
+
+                                    }}
+
+
+                                >
+
+                                    <Highlighter
+                                        searchWords={[search]}
+                                        autoEscape={true}
+                                        textToHighlight={node.displayName || node.name}
+                                        highlightStyle={{
+                                            backgroundColor:
+                                                matchIndex === activeMatch
+                                                    ? "#ADD8E6"   // active match
+                                                    : "#DCDCDC",  // other matches
+                                            
+                                        }}
+                                    />
+
+                                </div>
+
+
+
+
+
+
                             </span>
 
                             {
@@ -688,11 +776,16 @@ export default function NodeTree({
 
                                     </Button>
 
-                                    <Button onClick={handleDelete} style={{ border: "none" }} data-tooltip-id="common"
-                                        data-tooltip-content={"Delete"}>
+                                    {
+                                        selectedNodeId !== 1 && (
+
+                                            <Button onClick={handleDelete} style={{ border: "none" }} data-tooltip-id="common"
+                                                data-tooltip-content={"Delete"}>
 
 
-                                        <DeleteIcon fontSize="small" /> </Button>
+                                                <DeleteIcon fontSize="small" /> </Button>
+                                        )
+                                    }
 
                                     {
                                         !node.isLeaf && (
@@ -754,6 +847,16 @@ export default function NodeTree({
                         deleteNode={deleteNode}
 
                         addChildNode={addChildNode}
+
+                        search={search}
+
+                        registerMatchRef={registerMatchRef}
+
+                        activeMatch={activeMatch}
+                        matches={matches}
+
+                        selectedHierarchy={selectedHierarchy}
+
 
                     />
 

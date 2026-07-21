@@ -10,6 +10,7 @@ const useStructureTree = () => {
     const [selectedHierarchy, setSelectedHierarchy] = useState("");
 
 
+
     const handleStructure = async (HierarchicalName) => {
         try {
             const res = await axios.get(
@@ -24,8 +25,14 @@ const useStructureTree = () => {
 
             setSelectedHierarchy(HierarchicalName);
             setShowTreeDialog(true);
+
+                    return tree;
+
+
+
         } catch (err) {
             console.error(err);
+            return [];
         }
     };
 
@@ -35,7 +42,7 @@ const useStructureTree = () => {
         showTreeDialog,
         selectedHierarchy,
         handleStructure,
-        setShowTreeDialog
+        setShowTreeDialog,
         
     };
 };

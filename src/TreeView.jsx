@@ -1,15 +1,24 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import NodeTree from "./NodeTree";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
+import SearchIcon from '@mui/icons-material/Search';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { Button } from "@progress/kendo-react-buttons";
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import axios from 'axios';
+
+import useStructureTree from "./useStructureTree";
+ 
 
 
 function updateTree(nodes, nodeId, callback) {
 
-    return nodes.map((node)=>{
+    return nodes.map((node) => {
 
-        if(node.id === nodeId){
+        if (node.id === nodeId) {
             return callback(node);
         }
 
@@ -17,7 +26,7 @@ function updateTree(nodes, nodeId, callback) {
         return {
             ...node,
             children: node.children
-                ? updateTree(node.children,nodeId,callback)
+                ? updateTree(node.children, nodeId, callback)
                 : []
         };
 
@@ -26,22 +35,22 @@ function updateTree(nodes, nodeId, callback) {
 }
 
 
-export function editNode(nodes,nodeId,newName){
+export function editNode(nodes, nodeId, newName) {
 
     return updateTree(
         nodes,
         nodeId,
-        (node)=>({
+        (node) => ({
             ...node,
-          
-            displayName:newName
+
+            displayName: newName
         })
     );
 }
 
-export function deleteNode(nodes,nodeId){
-    return  nodes.filter(node=>node.id!==nodeId).map(node=> ({
-        ...node , children:node.children ?  deleteNode(node.children,nodeId):[]
+export function deleteNode(nodes, nodeId) {
+    return nodes.filter(node => node.id !== nodeId).map(node => ({
+        ...node, children: node.children ? deleteNode(node.children, nodeId) : []
     }));
 
 }
@@ -54,7 +63,7 @@ export function addChildNode(nodes = [], parentId, child) {
 
         if (node.id === parentId) {
 
-            
+
             return {
                 ...node,
                 children: [...(node.children || []), child]
@@ -77,34 +86,210 @@ function TreeView({
     data,
     editable,
     selectedContainerName,
-    onTreeChange
-}){
+    onTreeChange,selectedHierarchy,
+    originalTree,handleStructure
+}) {
 
 
-    const [tree,setTree] = useState([]);
+    const [tree, setTree] = useState([]);
 
-    const [selectedNodeId,setSelectedNodeId] = useState(null);
+    const [selectedNodeId, setSelectedNodeId] = useState(null);
 
-       
+    const [search, setSearch] = useState(null);
 
-    useEffect(()=>{
+    const [activeMatch, setActiveMatch] = useState(0);
+
+    const matchRefs = useRef({});
+
+    const matches = [];
+
+    
+
+
+
+
+
+    const collectMatches = (nodes) => {
+
+        nodes.forEach(node => {
+
+            const name =
+                node.displayName || node.name;
+
+
+            if (
+                search &&
+                name.toLowerCase()
+                    .includes(search.toLowerCase())
+            ) {
+
+                matches.push(node.id);
+
+            }
+
+
+            if (node.children && node.children.length) {
+                collectMatches(node.children);
+            }
+
+        });
+
+    };
+
+
+    collectMatches(tree);
+
+
+
+    const registerMatchRef = (id, element) => {
+
+        if (element) {
+            matchRefs.current[id] = element;
+        }
+
+    };
+
+
+    const scrollToMatch = (index) => {
+
+        const nodeId = matches[index];
+
+        const element =
+            matchRefs.current[nodeId];
+
+
+        if (element) {
+
+            element.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        }
+
+    };
+
+
+    const nextMatch = () => {
+
+        if (matches.length === 0)
+            return;
+
+
+        const next =
+            activeMatch + 1 >= matches.length
+                ? 0
+                : activeMatch + 1;
+
+
+        setActiveMatch(next);
+
+        scrollToMatch(next);
+
+    };
+
+
+
+    const previousMatch = () => {
+
+        if (matches.length === 0)
+            return;
+
+
+        const previous =
+            activeMatch - 1 < 0
+                ? matches.length - 1
+                : activeMatch - 1;
+
+
+        setActiveMatch(previous);
+
+        scrollToMatch(previous);
+
+    };
+
+
+
+
+
+
+
+
+
+    useEffect(() => {
 
         setTree(data || []);
 
-    },[data]);
+    }, [data]);
 
 
 
-    const updateTreeData=(updated)=>{
+    const updateTreeData = (updated) => {
 
         setTree(updated);
 
 
-        if(onTreeChange){
+        if (onTreeChange) {
             onTreeChange(updated);
         }
 
     };
+
+
+
+const reset = async () => {
+
+    const tree = await handleStructure(selectedHierarchy);
+
+    if (!tree) return;
+
+    const renameNodes = (nodes) =>
+        nodes.map(node => {
+
+            const numberPart =
+                (node.name || "").replace(/^[^\d]+/, "");
+
+            const newName =
+                `${selectedContainerName}${numberPart}`;
+
+            return {
+                ...node,
+                name: newName,
+                displayName: newName,
+                children: renameNodes(node.children || [])
+            };
+        });
+
+
+    const resetTree = renameNodes(tree);
+
+    setTree(resetTree);
+
+
+    onTreeChange?.(resetTree);
+
+
+     axios.put(
+            `http://localhost:8081/structure/editNode/${selectedContainerName}`,
+            {
+                nodedata: {
+                    tree: resetTree
+                }
+            }
+        ).catch(err => {
+            console.log(err);
+            alert("clone failed");
+        });
+};
+
+
+
+
+
+
+
+
+
 
 
 
@@ -114,41 +299,135 @@ function TreeView({
         <div>
 
 
-       
 
-        {
-        tree.map(node=>(
 
-            <NodeTree
 
-                key={node.id}
+            {/* <div style={{ padding: "8px" ,textAlign:"right"}}>
 
-                node={node}
+                <SearchIcon/>
 
-                tree={tree}
+                <input type="text" placeholder="search " value={search} onChange={(e) => setSearch(e.target.value)} style={{ width: "200px", height: "30px" }} />
 
-                setTree={updateTreeData}
 
-                selectedNodeId={selectedNodeId}
+            </div> */}
 
-                setSelectedNodeId={setSelectedNodeId}
+{
 
-                editable={editable}
+  editable && (
 
-                selectedContainerName={selectedContainerName}
+<div style={{display:"flex", justifyContent:"flex-end",marginRight:"8px",position:"sticky" , top: 0,}}>
+        <Button onClick={reset}><RestartAltIcon fontSize="small"/></Button>
 
-                editNode={editNode}
+    
+   </div> 
+      )
 
-                deleteNode={deleteNode}
 
-                addChildNode={addChildNode}
 
-            />
+}
 
-        ))
-        }
+            {/* <div style={{ padding:"8px", textAlign:"right" }}> */}
+            <div style={{
+                position: "sticky",
+                top: 0,
+                padding: "10px",
+                textAlign: "left",
 
-          <Tooltip id="common"/>
+            }}>
+
+
+                <SearchIcon />
+
+                <input
+                    type="text"
+                    placeholder="search"
+                    value={search || ""}
+                    onChange={(e) => {
+                        setSearch(e.target.value);
+                        setActiveMatch(0);
+                    }}
+                    style={{
+                        width: "200px",
+                        height: "30px",
+                        marginRight:"10px"
+                    }}
+                />
+
+
+               
+                    <Button onClick={previousMatch}>
+                        <ArrowUpwardIcon fontSize="small" />
+                    </Button>
+
+
+                    <span style={{ padding: "6px" }}>
+                        {
+                            matches.length
+                                ?
+                                `${activeMatch + 1}/${matches.length}`
+                                :
+                                "0/0"
+                        }
+                    </span>
+
+
+                    <Button onClick={nextMatch}>
+                        <ArrowDownwardIcon fontSize="small" />
+                    </Button>
+                
+
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+            {
+                tree.map(node => (
+
+                    <NodeTree
+
+                        key={node.id}
+
+                        node={node}
+
+                        tree={tree}
+
+                        setTree={updateTreeData}
+
+                        selectedNodeId={selectedNodeId}
+
+                        setSelectedNodeId={setSelectedNodeId}
+
+                        editable={editable}
+
+                        selectedHierarchy={selectedHierarchy}
+
+                        selectedContainerName={selectedContainerName}
+
+                        editNode={editNode}
+
+                        deleteNode={deleteNode}
+
+                        addChildNode={addChildNode}
+                        search={search}
+                        registerMatchRef={registerMatchRef}
+                        activeMatch={activeMatch}
+                        matches={matches}
+
+
+                    />
+
+                ))
+            }
+
+            <Tooltip id="common" />
 
 
         </div>
