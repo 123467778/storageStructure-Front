@@ -759,7 +759,7 @@ export default function NodeTree({
 
                                 <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
                                     {
-                                        selectedNodeId!==0 && (
+                                        selectedNodeId!==1 && (
                                             <Button
                                         onClick={(e) => {
 
@@ -781,7 +781,7 @@ export default function NodeTree({
                                     }
 
                                     {
-                                        selectedNodeId !== 0 && (
+                                        selectedNodeId !== 1 && (
 
                                             <Button onClick={handleDelete} style={{ border: "none" }} data-tooltip-id="common"
                                                 data-tooltip-content={"Delete"}>
@@ -807,7 +807,7 @@ export default function NodeTree({
 
 
                                  {
-                                    selectedNodeId!==0 && (
+                                    selectedNodeId!==1 && (
                                            <Button onClick={handleClone} style={{ border: "none" }} data-tooltip-id="common"
                                         data-tooltip-content={"Clone Node"}><FileCopyIcon fontSize="small" /></Button>
                                     )

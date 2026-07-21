@@ -41,7 +41,7 @@ function createNodes(levels, currentLevel = 0, path = "") {
 }
 
 export function generateTree(levels) {
-    id = 1; 
+    id = 2; 
     return createNodes(levels);
 }
 

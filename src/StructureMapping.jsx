@@ -391,7 +391,7 @@ const nodeNaming = (nodes, containerName) => {
 
     return [
         {
-            id: 0,
+            id: 1,
             key:uuidGeneration(), // or uuidGeneration()
             name: containerName,
             displayName: containerName,

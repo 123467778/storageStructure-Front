@@ -361,7 +361,7 @@ const reset = async () => {
 
 
                
-                    <Button onClick={previousMatch} data-tooltip-id="common" data-tooltip-content={"previous"}>
+                    <Button onClick={previousMatch} data-tooltip-id="common" data-tooltip-content={"previous"} style={{border:"none", background:"white" }}>
                         <ArrowUpwardIcon fontSize="small" />
                     </Button>
 
@@ -377,7 +377,7 @@ const reset = async () => {
                     </span>
 
 
-                    <Button onClick={nextMatch} style={{marginRight:'10px'}} data-tooltip-id="common" data-tooltip-content={"next"}>
+                    <Button onClick={nextMatch} style={{marginRight:'10px' ,border:"none", background:"white" }} data-tooltip-id="common" data-tooltip-content={"next"}>
                         <ArrowDownwardIcon fontSize="small" />
                     </Button>
 
