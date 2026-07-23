@@ -392,9 +392,10 @@ const nodeNaming = (nodes, containerName) => {
     return [
         {
             id: 1,
-            key:uuidGeneration(), // or uuidGeneration()
+            key:uuidGeneration(),
             name: containerName,
             displayName: containerName,
+            isRoot:true,
             icon: "freezer",
             isLeaf: false,
             children: childNodes
@@ -530,7 +531,7 @@ const nodeNaming = (nodes, containerName) => {
                     width={600}
                     onClose={() => setShowTreeDialog(false)}
                 >
-                    <div style={{ maxHeight: "500px", overflowY: "auto" }}>
+                    <div style={{ maxHeight: "500px", overflowY: "auto"}}>
                         <TreeView
                             // data={getDisplayTree(selectedContainerName)}
                             data={treeData}
@@ -548,7 +549,7 @@ const nodeNaming = (nodes, containerName) => {
                     width={600}
                     onClose={() => setEditDialog(false)}
                 >
-                    <div style={{ maxHeight: "500px", overflowY: "auto" }}>
+                    <div style={{ maxHeight: "500px", overflowY: "auto", border: "1px solid #ddd", }}>
                         <TreeView
                             // data={getDisplayTree(selectedContainerName)}
                                                         data={treeData}

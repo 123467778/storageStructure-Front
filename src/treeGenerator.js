@@ -1,5 +1,4 @@
 let id = 1;
-// const key = crypto.randomUUID();
 export function uuidGeneration() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
     const r = Math.random() * 16 | 0;
@@ -29,8 +28,7 @@ function createNodes(levels, currentLevel = 0, path = "") {
                icon: current.icon, 
                isLeaf:current.isLeaf,
                key:uuidGeneration(),
-
-
+               isRoot:false,
             children: createNodes(levels, currentLevel + 1, currentPath)
         });
     }
@@ -50,7 +48,6 @@ export function getNextId() {
 
     return id++;
 }
-
 
 
 

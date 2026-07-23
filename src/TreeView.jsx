@@ -10,7 +10,9 @@ import { Button } from "@progress/kendo-react-buttons";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import axios from 'axios';
 import { generateTree } from "./treeGenerator";
- 
+import { uuidGeneration } from "./treeGenerator";
+
+
 
 
 function updateTree(nodes, nodeId, callback) {
@@ -85,8 +87,8 @@ function TreeView({
     data,
     editable,
     selectedContainerName,
-    onTreeChange,selectedHierarchy,
-    originalTree,handleStructure
+    onTreeChange, selectedHierarchy,
+    originalTree, handleStructure
 }) {
 
 
@@ -102,7 +104,7 @@ function TreeView({
 
     const matches = [];
 
-    
+
 
 
 
@@ -236,62 +238,75 @@ function TreeView({
 
 
 
-const reset = async () => {
+    const reset = async () => {
 
-    const res = await axios.get(
+        const res = await axios.get(
             `http://localhost:8081/structure/getStructure/${selectedHierarchy}`
         );;
-    
-   const tree = generateTree(res.data);
 
-    if (!tree) return;
+        const tree = generateTree(res.data);
 
-    const renameNodes = (nodes) =>
-        nodes.map(node => {
+        if (!tree) return;
 
-            const numberPart =
-                (node.name || "").replace(/^[^\d]+/, "");
+        const renameNodes = (nodes) =>
+            nodes.map(node => {
 
-            const newName =
-                `${selectedContainerName}${numberPart}`;
+                const numberPart =
+                    (node.name || "").replace(/^[^\d]+/, "");
 
-            return {
-                ...node,
-                name: newName,
-                displayName: newName,
-                children: renameNodes(node.children || [])
-            };
-        });
+                //  const numberPart = (node.name || "").match(/\d+$/)?.[0] || "";
 
 
-    const resetTree = renameNodes(tree);
-
-    setTree(resetTree);
-
-
-    onTreeChange?.(resetTree);
+                const newName =
+                    `${selectedContainerName}${numberPart}`;
 
 
-     axios.put(
+                return {
+                    ...node,
+                    name: newName,
+                    displayName: newName,
+                    children: renameNodes(node.children || [])
+                };
+            });
+
+
+
+
+
+        const resetTree = renameNodes(tree);
+
+        const finalTree = [
+            {
+                id: 1,
+                key: uuidGeneration(),
+                name: selectedContainerName,
+                displayName: selectedContainerName,
+                isRoot: true,
+                icon: "freezer",
+                isLeaf: false,
+                children: resetTree
+            }
+        ];
+
+
+        setTree(finalTree);
+
+
+        onTreeChange?.(finalTree);
+
+
+        axios.put(
             `http://localhost:8081/structure/editNode/${selectedContainerName}`,
             {
                 nodedata: {
-                    tree: resetTree
+                    tree: finalTree
                 }
             }
         ).catch(err => {
             console.log(err);
             alert("clone failed");
         });
-};
-
-
-
-
-
-
-
-
+    };
 
 
 
@@ -314,7 +329,7 @@ const reset = async () => {
 
             </div> */}
 
-{/* {
+            {/* {
 
   editable && (
 
@@ -333,8 +348,13 @@ const reset = async () => {
             <div style={{
                 position: "sticky",
                 top: 0,
-                padding: "10px",
+              
+              
+             
                 textAlign: "left",
+              
+                
+
 
             }}>
 
@@ -352,62 +372,53 @@ const reset = async () => {
                     style={{
                         width: "200px",
                         height: "30px",
-                        marginRight:"15px",
-                        border:"none",
-                        borderBottom:"2px solid #A9A9A9",
+                        marginRight: "15px",
+                  
+                       
+                       
 
                     }}
                 />
 
 
-               
-                    <Button onClick={previousMatch} data-tooltip-id="common" data-tooltip-content={"previous"} style={{border:"none", background:"white" }}>
-                        <ArrowUpwardIcon fontSize="small" />
-                    </Button>
+
+                <Button onClick={previousMatch} data-tooltip-id="common" data-tooltip-content={"previous"} style={{ border: "none", background: "white" }}>
+                    <ArrowUpwardIcon fontSize="small" />
+                </Button>
 
 
-                    <span style={{ padding: "8px" }}>
-                        {
-                            matches.length
-                                ?
-                                `${activeMatch + 1}/${matches.length}`
-                                :
-                                "0/0"
-                        }
-                    </span>
-
-
-                    <Button onClick={nextMatch} style={{marginRight:'10px' ,border:"none", background:"white" }} data-tooltip-id="common" data-tooltip-content={"next"}>
-                        <ArrowDownwardIcon fontSize="small" />
-                    </Button>
-
+                <span style={{ padding: "8px" }}>
                     {
-
-  editable && (
-
-  
-        <Button onClick={reset} data-tooltip-id="common" data-tooltip-content={"Reset structure"} ><RestartAltIcon fontSize="small"/></Button>
-
-    
-  
-      )
+                        matches.length
+                            ?
+                            `${activeMatch + 1}/${matches.length}`
+                            :
+                            "0/0"
+                    }
+                </span>
 
 
+                <Button onClick={nextMatch} style={{ marginRight: '10px', border: "none", background: "white" }} data-tooltip-id="common" data-tooltip-content={"next"}>
+                    <ArrowDownwardIcon fontSize="small" />
+                </Button>
 
-}
-                
+                {
+
+                    editable && (
+
+
+                        <Button onClick={reset} data-tooltip-id="common" data-tooltip-content={"Reset structure"} ><RestartAltIcon fontSize="small" /></Button>
+
+
+
+                    )
+
+
+
+                }
+
 
             </div>
-
-
-
-
-
-
-
-
-
-
 
             {
                 tree.map(node => (
@@ -447,6 +458,10 @@ const reset = async () => {
 
                 ))
             }
+
+
+
+
 
             <Tooltip id="common" />
 

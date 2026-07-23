@@ -132,11 +132,7 @@ function GetHierarchical() {
                 >
                     <div
                         style={{
-                            height: "400px",
-                            overflowY: "auto",
-                            overflowX: "auto",
-                            padding: "10px",
-                            border: "1px solid #ddd",
+                           maxHeight: "500px", overflowY: "auto" , border: "1px solid #ddd"
                         }}
                     >
                         <TreeView
