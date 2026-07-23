@@ -141,36 +141,36 @@ export default function NodeTree({
 
 
 
-// function getMaxId(tree) {
-//   let max = 0;
+    // function getMaxId(tree) {
+    //   let max = 0;
 
-//   for (let i = 1; i < tree.length; i++) {
-//     if (tree[i].id > max) {
-//       max = tree[i].id;
-//     }
-//   }
+    //   for (let i = 1; i < tree.length; i++) {
+    //     if (tree[i].id > max) {
+    //       max = tree[i].id;
+    //     }
+    //   }
 
-//   return max + 1;
-// }
+    //   return max + 1;
+    // }
 
-function getMaxId(tree) {
-  let maxId = 0;
+    function getMaxId(tree) {
+        let maxId = 0;
 
-  function traverse(nodes=[]) {
-    for (const node of nodes) {
-      maxId = Math.max(maxId, node.id);
+        function traverse(nodes = []) {
+            for (const node of nodes) {
+                maxId = Math.max(maxId, node.id);
 
-      if (node.children?.length) {
-        traverse(node.children);
-      }
+                if (node.children?.length) {
+                    traverse(node.children);
+                }
+            }
+        }
+
+        traverse(tree);
+        return maxId;
     }
-  }
 
-  traverse(tree);
-  return maxId;
-}
-
-// console.log(getMaxId(tree)); // 15
+    // console.log(getMaxId(tree)); // 15
 
 
 
@@ -207,7 +207,7 @@ function getMaxId(tree) {
 
                 });
 
-                
+
 
         }
         catch (err) {
@@ -217,7 +217,7 @@ function getMaxId(tree) {
 
     }
 
-    
+
 
 
 
@@ -356,65 +356,65 @@ function getMaxId(tree) {
     // }
 
 
-function findReferenceChild(nodes, currentNode) {
-    for (const item of nodes) {
-        if (item.id !== currentNode.id &&
-            item.icon === currentNode.icon &&
-            item.children?.length) {
-            return item.children[0];
+    function findReferenceChild(nodes, currentNode) {
+        for (const item of nodes) {
+            if (item.id !== currentNode.id &&
+                item.icon === currentNode.icon &&
+                item.children?.length) {
+                return item.children[0];
+            }
+
+            if (item.children?.length) {
+                const result = findReferenceChild(item.children, currentNode);
+                if (result) return result;
+            }
         }
 
-        if (item.children?.length) {
-            const result = findReferenceChild(item.children, currentNode);
-            if (result) return result;
-        }
+        return null;
+
+
+
     }
 
-    return null;
 
+    function getReferenceChild(nodes, currentNode) {
+        for (const item of nodes) {
+            if (item.id !== currentNode.id &&
+              
+                item.children?.length) {
+                return item.children[0];
+            }
 
-
-}
-
-
-function getReferenceChild(nodes, currentNode) {
-    for (const item of nodes) {
-        if (item.id !== currentNode.id &&
-            item.icon !== currentNode.icon &&
-            item.children?.length) {
-            return item;
+           if (item.children?.length) {
+                const result = getReferenceChild(item.children, currentNode);
+                if (result) return result;
+            }
         }
 
-        if (item.children?.length) {
-            const result = getReferenceChild(item.children, currentNode);
-            if (result) return result;
-        }
+        return null;
     }
 
-    return null;
-}
 
 
 
+    const handleAddChild = async (e) => {
+        e.stopPropagation();
 
- const handleAddChild = async (e) => {
-    e.stopPropagation();
+        let childNode = "";
+        let childId = getMaxId(tree) + 1;
+        let ChildIcon = null;
+        let isLeaf = true;
 
-    let childNode = "";
-    let childId = getMaxId(tree) + 1;
-    let ChildIcon = null;
-    let isLeaf = true;
+        // let existingTree = originalTree;
 
-    let existingTree = originalTree;
+        console.log("Original Tree", originalTree);
 
-    console.log("Original Tree" , originalTree);
+        //   //  const hasOnlyRoot =
+        //         tree &&
+        //         tree.length === 1 &&
+        //         (!tree[0].children || tree[0].children.length === 0);
 
-    const hasOnlyRoot =
-        tree &&
-        tree.length === 1 &&
-        (!tree[0].children || tree[0].children.length === 0);
-
-    if (!hasOnlyRoot) {
+        // if (!hasOnlyRoot) {
 
         if (node.children && node.children.length > 0) {
 
@@ -431,91 +431,105 @@ function getReferenceChild(nodes, currentNode) {
 
             const parentNumber = node.name.match(/\d+$/)?.[0] || "";
 
-            const sampleChild = findReferenceChild(existingTree, node);
+            const sampleChild = findReferenceChild(tree, node);
 
             if (sampleChild) {
                 ChildIcon = sampleChild.icon;
                 isLeaf = sampleChild.isLeaf;
+                childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
             }
+            else {
 
-            childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
+                const res = await axios.get(
+                    `http://localhost:8081/structure/getStructure/${selectedHierarchy}`
+                );
+
+                const newTree = generateTree(res.data);
+
+                if (!newTree) return;
+
+                const renameNodes = (nodes) =>
+                    nodes.map((item) => {
+                        const numberPart = (item.name || "").replace(/^[^\d]+/, "");
+
+                        const newName = `${selectedContainerName}${numberPart}`;
+
+                        return {
+                            ...item,
+                            name: newName,
+                            displayName: newName,
+                            children: renameNodes(item.children || [])
+                        };
+                    });
+
+                const resetTree = renameNodes(newTree);
+
+                 const finalTree = [
+            {
+                id: 1,
+                key: uuidGeneration(),
+                name: selectedContainerName,
+                displayName: selectedContainerName,
+                isRoot: true,
+                icon: "freezer",
+                isLeaf: false,
+                children: resetTree
+            }
+        ];
+
+
+
+
+                const parentNumber = node.name.match(/\d+$/)?.[0] || "";
+
+
+                const sampleChild = getReferenceChild(finalTree, node);
+                console.log("Sample Child", sampleChild)
+
+                if (sampleChild) {
+                    ChildIcon = sampleChild.icon;
+                    isLeaf = sampleChild.isLeaf;
+                }
+
+                // childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
+
+                childNode = parentNumber
+                    ? node.name.replace(/\d+$/, `${parentNumber}1`)
+                    : `${node.name}1`;
+            }
         }
 
-    } else {
-
-        const res = await axios.get(
-            `http://localhost:8081/structure/getStructure/${selectedHierarchy}`
-        );
-
-        const newTree = generateTree(res.data);
-
-        if (!newTree) return;
-
-        const renameNodes = (nodes) =>
-            nodes.map((item) => {
-                const numberPart = (item.name || "").replace(/^[^\d]+/, "");
-
-                const newName = `${selectedContainerName}${numberPart}`;
-
-                return {
-                    ...item,
-                    name: newName,
-                    displayName: newName,
-                    children: renameNodes(item.children || [])
-                };
-            });
-
-        const resetTree = renameNodes(newTree);
-
-          
 
 
-        const parentNumber = node.name.match(/\d+$/)?.[0] || "";
+        const newChild = {
+            id: childId,
+            name: childNode,
+            displayName: childNode,
+            icon: ChildIcon,
+            isLeaf,
+            key: uuidGeneration(),
+            children: []
+        };
 
+        const updatedTree = addChildNode(tree, node.id, newChild);
 
-      const sampleChild = getReferenceChild(resetTree,node);
-      console.log("Sample Child" , sampleChild)
+        setTree(updatedTree);
 
-        if (sampleChild) {
-            ChildIcon = sampleChild.icon;
-            isLeaf = sampleChild.isLeaf;
+        try {
+            await axios.put(
+                `http://localhost:8081/structure/editNode/${selectedContainerName}`,
+                {
+                    nodedata: {
+                        tree: updatedTree
+                    }
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            alert("Add Child Failed");
         }
-
-        // childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
-
-        childNode = parentNumber
-    ? node.name.replace(/\d+$/, `${parentNumber}1`)
-    : `${node.name}1`;
-    }
-
-    const newChild = {
-        id: childId,
-        name: childNode,
-        displayName: childNode,
-        icon: ChildIcon,
-        isLeaf,
-        key: uuidGeneration(),
-        children: []
     };
 
-    const updatedTree = addChildNode(tree, node.id, newChild);
-
-    setTree(updatedTree);
-
-    try {
-        await axios.put(
-            `http://localhost:8081/structure/editNode/${selectedContainerName}`,
-            {
-                nodedata: {
-                    tree: updatedTree
-                }
-            }
-        );
-    } catch (err) {
-        console.log(err);
-        alert("Add Child Failed");
-    }
-};
 
 
 
@@ -526,132 +540,125 @@ function getReferenceChild(nodes, currentNode) {
 
 
 
+    //  const handleAddChild = async (e) => {
+    //     e.stopPropagation();
+
+    //     let childNode = "";
+    //     let childId = getMaxId(tree) + 1;
+    //     let ChildIcon = null;
+    //     let isLeaf = true;
+
+    //     let existingTree = originalTree;
+
+    //     console.log("Original Tree" , originalTree);
+
+    //     // const hasOnlyRoot =
+    //     //     tree &&
+    //     //     tree.length === 1 &&
+    //     //     (!tree[0].children || tree[0].children.length === 0);
 
 
 
+    //     const hasOnlyRoot = node.isRoot;
 
+    //     if (!hasOnlyRoot) {
 
+    //         if (node.children && node.children.length > 0) {
 
+    //             const lastNode = node.children[node.children.length - 1];
 
-//  const handleAddChild = async (e) => {
-//     e.stopPropagation();
+    //             let num = Number(lastNode.name.match(/\d+$/)?.[0] || 0);
 
-//     let childNode = "";
-//     let childId = getMaxId(tree) + 1;
-//     let ChildIcon = null;
-//     let isLeaf = true;
+    //             childNode = lastNode.name.replace(/\d+$/, ++num);
 
-//     let existingTree = originalTree;
+    //             ChildIcon = lastNode.icon;
+    //             isLeaf = lastNode.isLeaf;
 
-//     console.log("Original Tree" , originalTree);
+    //         } else {
 
-//     // const hasOnlyRoot =
-//     //     tree &&
-//     //     tree.length === 1 &&
-//     //     (!tree[0].children || tree[0].children.length === 0);
+    //             const parentNumber = node.name.match(/\d+$/)?.[0] || "";
 
+    //             const sampleChild = findReferenceChild(tree, node);
 
+    //             if (sampleChild) {
+    //                 ChildIcon = sampleChild.icon;
+    //                 isLeaf = sampleChild.isLeaf;
+    //             }
 
-//     const hasOnlyRoot = node.isRoot;
+    //             childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
+    //         }
 
-//     if (!hasOnlyRoot) {
+    //     } else {
 
-//         if (node.children && node.children.length > 0) {
+    //         const res = await axios.get(
+    //             `http://localhost:8081/structure/getStructure/${selectedHierarchy}`
+    //         );
 
-//             const lastNode = node.children[node.children.length - 1];
+    //         const newTree = generateTree(res.data);
 
-//             let num = Number(lastNode.name.match(/\d+$/)?.[0] || 0);
+    //         if (!newTree) return;
 
-//             childNode = lastNode.name.replace(/\d+$/, ++num);
+    //         const renameNodes = (nodes) =>
+    //             nodes.map((item) => {
+    //                 const numberPart = (item.name || "").replace(/^[^\d]+/, "");
 
-//             ChildIcon = lastNode.icon;
-//             isLeaf = lastNode.isLeaf;
+    //                 const newName = `${selectedContainerName}${numberPart}`;
 
-//         } else {
+    //                 return {
+    //                     ...item,
+    //                     name: newName,
+    //                     displayName: newName,
+    //                     children: renameNodes(item.children || [])
+    //                 };
+    //             });
 
-//             const parentNumber = node.name.match(/\d+$/)?.[0] || "";
+    //         const resetTree = renameNodes(newTree);
 
-//             const sampleChild = findReferenceChild(tree, node);
+    //         const parentNumber = node.name.match(/\d+$/)?.[0] || "";
 
-//             if (sampleChild) {
-//                 ChildIcon = sampleChild.icon;
-//                 isLeaf = sampleChild.isLeaf;
-//             }
+    //       const sampleChild = getReferenceChild(resetTree,node);
+    //       console.log("Sample Child" , sampleChild)
 
-//             childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
-//         }
+    //         if (sampleChild) {
+    //             ChildIcon = sampleChild.icon;
+    //             isLeaf = sampleChild.isLeaf;
+    //         }
 
-//     } else {
+    //         // childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
 
-//         const res = await axios.get(
-//             `http://localhost:8081/structure/getStructure/${selectedHierarchy}`
-//         );
+    //         childNode = parentNumber
+    //     ? node.name.replace(/\d+$/, `${parentNumber}1`)
+    //     : `${node.name}1`;
+    //     }
 
-//         const newTree = generateTree(res.data);
+    //     const newChild = {
+    //         id: childId,
+    //         name: childNode,
+    //         displayName: childNode,
+    //         icon: ChildIcon,
+    //         isLeaf,
+    //         key: uuidGeneration(),
+    //         children: []
+    //     };
 
-//         if (!newTree) return;
+    //     const updatedTree = addChildNode(tree, node.id, newChild);
 
-//         const renameNodes = (nodes) =>
-//             nodes.map((item) => {
-//                 const numberPart = (item.name || "").replace(/^[^\d]+/, "");
+    //     setTree(updatedTree);
 
-//                 const newName = `${selectedContainerName}${numberPart}`;
-
-//                 return {
-//                     ...item,
-//                     name: newName,
-//                     displayName: newName,
-//                     children: renameNodes(item.children || [])
-//                 };
-//             });
-
-//         const resetTree = renameNodes(newTree);
-
-//         const parentNumber = node.name.match(/\d+$/)?.[0] || "";
-
-//       const sampleChild = getReferenceChild(resetTree,node);
-//       console.log("Sample Child" , sampleChild)
-
-//         if (sampleChild) {
-//             ChildIcon = sampleChild.icon;
-//             isLeaf = sampleChild.isLeaf;
-//         }
-
-//         // childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
-
-//         childNode = parentNumber
-//     ? node.name.replace(/\d+$/, `${parentNumber}1`)
-//     : `${node.name}1`;
-//     }
-
-//     const newChild = {
-//         id: childId,
-//         name: childNode,
-//         displayName: childNode,
-//         icon: ChildIcon,
-//         isLeaf,
-//         key: uuidGeneration(),
-//         children: []
-//     };
-
-//     const updatedTree = addChildNode(tree, node.id, newChild);
-
-//     setTree(updatedTree);
-
-//     try {
-//         await axios.put(
-//             `http://localhost:8081/structure/editNode/${selectedContainerName}`,
-//             {
-//                 nodedata: {
-//                     tree: updatedTree
-//                 }
-//             }
-//         );
-//     } catch (err) {
-//         console.log(err);
-//         alert("Add Child Failed");
-//     }
-// };
+    //     try {
+    //         await axios.put(
+    //             `http://localhost:8081/structure/editNode/${selectedContainerName}`,
+    //             {
+    //                 nodedata: {
+    //                     tree: updatedTree
+    //                 }
+    //             }
+    //         );
+    //     } catch (err) {
+    //         console.log(err);
+    //         alert("Add Child Failed");
+    //     }
+    // };
 
 
 
@@ -695,9 +702,9 @@ function getReferenceChild(nodes, currentNode) {
 
     //         console.log(childNode);
 
-           
 
-          
+
+
 
     //         ChildIcon = lastNode.icon;
 
@@ -791,7 +798,7 @@ function getReferenceChild(nodes, currentNode) {
     //             }
     //         );
 
-          
+
 
     //     } catch (err) {
 
@@ -802,115 +809,115 @@ function getReferenceChild(nodes, currentNode) {
     // };
 
 
-// const handleAddChild = async (e) => {
-//     e.stopPropagation();
+    // const handleAddChild = async (e) => {
+    //     e.stopPropagation();
 
-//     let childNode = "";
-//     let childId = getMaxId()+1;
-//     let ChildIcon = null;
-//     let isLeaf = true;
+    //     let childNode = "";
+    //     let childId = getMaxId()+1;
+    //     let ChildIcon = null;
+    //     let isLeaf = true;
 
-//     const hasOnlyRoot =
-//         tree &&
-//         tree.length === 1;
-        
-//     if (!hasOnlyRoot) {
+    //     const hasOnlyRoot =
+    //         tree &&
+    //         tree.length === 1;
 
-//         if (node.children && node.children.length > 0) {
+    //     if (!hasOnlyRoot) {
 
-//             const lastNode = node.children[node.children.length - 1];
+    //         if (node.children && node.children.length > 0) {
 
-//             let num = Number(lastNode.name.match(/\d+$/)?.[0] || 0);
+    //             const lastNode = node.children[node.children.length - 1];
 
-//             childNode = lastNode.name.replace(/\d+$/, ++num);
+    //             let num = Number(lastNode.name.match(/\d+$/)?.[0] || 0);
 
-//             ChildIcon = lastNode.icon;
-//             isLeaf = lastNode.isLeaf;
+    //             childNode = lastNode.name.replace(/\d+$/, ++num);
 
-//         } else {
+    //             ChildIcon = lastNode.icon;
+    //             isLeaf = lastNode.isLeaf;
 
-//             const parentNumber = node.name.match(/\d+$/)?.[0];
+    //         } else {
 
-//             const sampleChild = findReferenceChild(tree, node);
+    //             const parentNumber = node.name.match(/\d+$/)?.[0];
 
-//             if (sampleChild) {
-//                 ChildIcon = sampleChild.icon;
-//                 isLeaf = sampleChild.isLeaf;
-//             }
+    //             const sampleChild = findReferenceChild(tree, node);
 
-//             childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
-//         }
+    //             if (sampleChild) {
+    //                 ChildIcon = sampleChild.icon;
+    //                 isLeaf = sampleChild.isLeaf;
+    //             }
 
-//     } else {
+    //             childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
+    //         }
 
-//         const res = await axios.get(
-//             `http://localhost:8081/structure/getStructure/${selectedHierarchy}`
-//         );
+    //     } else {
 
-//         const newTree = generateTree(res.data);
+    //         const res = await axios.get(
+    //             `http://localhost:8081/structure/getStructure/${selectedHierarchy}`
+    //         );
 
-//         if (!newTree) return;
+    //         const newTree = generateTree(res.data);
 
-//         const renameNodes = (nodes) =>
-//             nodes.map(item => {
+    //         if (!newTree) return;
 
-//                 const numberPart =
-//                     (item.name || "").replace(/^[^\d]+/, "");
+    //         const renameNodes = (nodes) =>
+    //             nodes.map(item => {
 
-//                 const newName = `${selectedContainerName}${numberPart}`;
+    //                 const numberPart =
+    //                     (item.name || "").replace(/^[^\d]+/, "");
 
-//                 return {
-//                     ...item,
-//                     name: newName,
-//                     displayName: newName,
-//                     children: renameNodes(item.children || [])
-//                 };
-//             });
+    //                 const newName = `${selectedContainerName}${numberPart}`;
 
-//         const resetTree = renameNodes(newTree);
+    //                 return {
+    //                     ...item,
+    //                     name: newName,
+    //                     displayName: newName,
+    //                     children: renameNodes(item.children || [])
+    //                 };
+    //             });
 
-//         const parentNumber = node.name.match(/\d+$/)?.[0]||"";
+    //         const resetTree = renameNodes(newTree);
 
-//         const sampleChild = resetTree.find(
-//             item => item.name !== node.name
-//         );
+    //         const parentNumber = node.name.match(/\d+$/)?.[0]||"";
 
-//         if (sampleChild) {
-//             ChildIcon = sampleChild.icon;
-//             isLeaf = sampleChild.isLeaf;
-//         }
+    //         const sampleChild = resetTree.find(
+    //             item => item.name !== node.name
+    //         );
 
-//         childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
-//     }
+    //         if (sampleChild) {
+    //             ChildIcon = sampleChild.icon;
+    //             isLeaf = sampleChild.isLeaf;
+    //         }
 
-//     const newChild = {
-//         id: childId,
-//         name: childNode,
-//         displayName: childNode,
-//         icon: ChildIcon,
-//         isLeaf,
-//         key: uuidGeneration(),
-//         children: []
-//     };
+    //         childNode = node.name.replace(/\d+$/, `${parentNumber}1`);
+    //     }
 
-//     const updatedTree = addChildNode(tree, node.id, newChild);
+    //     const newChild = {
+    //         id: childId,
+    //         name: childNode,
+    //         displayName: childNode,
+    //         icon: ChildIcon,
+    //         isLeaf,
+    //         key: uuidGeneration(),
+    //         children: []
+    //     };
 
-//     setTree(updatedTree);
+    //     const updatedTree = addChildNode(tree, node.id, newChild);
 
-//     try {
-//         await axios.put(
-//             `http://localhost:8081/structure/editNode/${selectedContainerName}`,
-//             {
-//                 nodedata: {
-//                     tree: updatedTree
-//                 }
-//             }
-//         );
-//     } catch (err) {
-//         console.log(err);
-//         alert("Add Child Failed");
-//     }
-// };
+    //     setTree(updatedTree);
+
+    //     try {
+    //         await axios.put(
+    //             `http://localhost:8081/structure/editNode/${selectedContainerName}`,
+    //             {
+    //                 nodedata: {
+    //                     tree: updatedTree
+    //                 }
+    //             }
+    //         );
+    //     } catch (err) {
+    //         console.log(err);
+    //         alert("Add Child Failed");
+    //     }
+    // };
 
 
 
@@ -936,7 +943,7 @@ function getReferenceChild(nodes, currentNode) {
 
     function cloneNode(node, newName) {
         return {
-            id: getNextId()+1,
+            id: getNextId() + 1,
             name: newName,
             displayName: newName,
             icon: node.icon,
@@ -1013,33 +1020,33 @@ function getReferenceChild(nodes, currentNode) {
 
 
         try {
-         axios.put(
-            `http://localhost:8081/structure/editNode/${selectedContainerName}`,
-            {
-                nodedata: {
-                    tree: updatedTree
+            axios.put(
+                `http://localhost:8081/structure/editNode/${selectedContainerName}`,
+                {
+                    nodedata: {
+                        tree: updatedTree
+                    }
                 }
-            }
-        );
+            );
 
 
 
-    } catch (err) {
-        console.log(err);
-        alert("clone Failed");
-    }
+        } catch (err) {
+            console.log(err);
+            alert("clone Failed");
+        }
 
-     
-        
+
+
         // .catch(err => {
         //     console.log(err);
         //     alert("clone failed");
         // });
 
 
-       
 
-     
+
+
 
 
     };
@@ -1224,9 +1231,9 @@ function getReferenceChild(nodes, currentNode) {
                                         highlightStyle={{
                                             backgroundColor:
                                                 matchIndex === activeMatch
-                                                    ? "#ADD8E6"   
-                                                    : "#DCDCDC",  
-                                            
+                                                    ? "#ADD8E6"
+                                                    : "#DCDCDC",
+
                                         }}
                                     />
 
@@ -1247,24 +1254,24 @@ function getReferenceChild(nodes, currentNode) {
 
                                 <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
                                     {
-                                        selectedNodeId!==1 && (
+                                        selectedNodeId !== 1 && (
                                             <Button
-                                        onClick={(e) => {
+                                                onClick={(e) => {
 
-                                            e.stopPropagation();
-                                            console.log("id", selectedNodeId);
-                                            setIsEditing(true);
+                                                    e.stopPropagation();
+                                                    console.log("id", selectedNodeId);
+                                                    setIsEditing(true);
 
-                                        }}
-                                        style={{ border: "none" }}
+                                                }}
+                                                style={{ border: "none" }}
 
-                                        data-tooltip-id="common"
-                                        data-tooltip-content={"Edit"}
+                                                data-tooltip-id="common"
+                                                data-tooltip-content={"Edit"}
 
-                                    >
-                                        <EditIcon fontSize="small" />
+                                            >
+                                                <EditIcon fontSize="small" />
 
-                                    </Button>
+                                            </Button>
                                         )
                                     }
 
@@ -1294,12 +1301,12 @@ function getReferenceChild(nodes, currentNode) {
                                     }
 
 
-                                 {
-                                    selectedNodeId!==1 && (
-                                           <Button onClick={handleClone} style={{ border: "none" }} data-tooltip-id="common"
-                                        data-tooltip-content={"Clone Node"}><FileCopyIcon fontSize="small" /></Button>
-                                    )
-                                 }
+                                    {
+                                        selectedNodeId !== 1 && (
+                                            <Button onClick={handleClone} style={{ border: "none" }} data-tooltip-id="common"
+                                                data-tooltip-content={"Clone Node"}><FileCopyIcon fontSize="small" /></Button>
+                                        )
+                                    }
                                 </div>
                             }
 
@@ -1361,7 +1368,7 @@ function getReferenceChild(nodes, currentNode) {
 
             }
 
-       
+
 
         </div>
 
