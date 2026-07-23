@@ -379,7 +379,7 @@ export default function NodeTree({
 
     function getReferenceChild(nodes, currentNode) {
         for (const item of nodes) {
-            if (item.id !== currentNode.id &&
+            if (item.id === currentNode.id &&
               
                 item.children?.length) {
                 return item.children[0];
