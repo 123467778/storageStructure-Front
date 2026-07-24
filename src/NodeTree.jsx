@@ -1017,6 +1017,9 @@ export default function NodeTree({
 
         else {
             const nodename = node.name.replace(/\d+$/, '');
+
+
+                                              
             const newName = `${nodename}${tree.length + 1}`;
             cloned = cloneNode(node, newName);
         }
@@ -1038,16 +1041,7 @@ export default function NodeTree({
                     }
                 }
             );
-             const res =  axios.get(
-
-                `http://localhost:8081/structure/getTree/${selectedContainerName}`
-
-            );
-
-
-            setTree(res.data.tree);
-
-
+           
 
         } catch (err) {
             console.log(err);
