@@ -58,6 +58,10 @@ function AddStructure({ onClose }) {
       return;
     }
 
+    if(!node.icon){
+      alert("select an icon");
+      return;
+    }
 
     const newNode = {
       level: levels.length + 1,

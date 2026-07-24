@@ -380,12 +380,12 @@ export default function NodeTree({
     function getReferenceChild(nodes, currentNode) {
         for (const item of nodes) {
             if (item.id === currentNode.id &&
-              
+
                 item.children?.length) {
                 return item.children[0];
             }
 
-           if (item.children?.length) {
+            if (item.children?.length) {
                 const result = getReferenceChild(item.children, currentNode);
                 if (result) return result;
             }
@@ -464,18 +464,18 @@ export default function NodeTree({
 
                 const resetTree = renameNodes(newTree);
 
-                 const finalTree = [
-            {
-                id: 1,
-                key: uuidGeneration(),
-                name: selectedContainerName,
-                displayName: selectedContainerName,
-                isRoot: true,
-                icon: "freezer",
-                isLeaf: false,
-                children: resetTree
-            }
-        ];
+                const finalTree = [
+                    {
+                        id: 1,
+                        key: uuidGeneration(),
+                        name: selectedContainerName,
+                        displayName: selectedContainerName,
+                        isRoot: true,
+                        icon: "freezer",
+                        isLeaf: false,
+                        children: resetTree
+                    }
+                ];
 
 
 
@@ -524,6 +524,16 @@ export default function NodeTree({
                     }
                 }
             );
+
+            const res = await axios.get(
+
+                `http://localhost:8081/structure/getTree/${selectedContainerName}`
+
+            );
+
+
+            setTree(res.data.tree);
+
         } catch (err) {
             console.log(err);
             alert("Add Child Failed");
@@ -1028,6 +1038,14 @@ export default function NodeTree({
                     }
                 }
             );
+             const res =  axios.get(
+
+                `http://localhost:8081/structure/getTree/${selectedContainerName}`
+
+            );
+
+
+            setTree(res.data.tree);
 
 
 
@@ -1065,41 +1083,6 @@ export default function NodeTree({
                     fontSize: "17px"
                 }} >
 
-
-                {/* <span
-                    onClick={() =>
-                        hasChildren && setOpen(!open)
-                    }
-
-                    style={{
-                        cursor: hasChildren
-                            ? "pointer"
-                            : "default"
-                    }}
-
-                >
-
-                    {
-                        hasChildren ?
-
-                            (
-                                open
-                                    ?
-                                    <i className="bi bi-caret-down-fill" />
-                                    :
-                                    <i className="bi bi-caret-right" />
-                            )
-
-                            :
-
-                            <i className="bi bi-box-seam" />
-
-                    }
-
-
-                </span> */}
-
-
                 <span
                     onClick={() => hasChildren && setOpen(!open)}
                     style={{
@@ -1110,6 +1093,7 @@ export default function NodeTree({
 
                     data-tooltip-id="common"
                     data-tooltip-content={node.icon}
+                    data-tooltip-place="left"
                 >
                     {
                         iconMap[node.icon] ||
@@ -1222,6 +1206,8 @@ export default function NodeTree({
                                     }}
 
 
+
+
                                 >
 
                                     <Highlighter
@@ -1235,6 +1221,8 @@ export default function NodeTree({
                                                     : "#DCDCDC",
 
                                         }}
+
+
                                     />
 
                                 </div>
@@ -1267,6 +1255,7 @@ export default function NodeTree({
 
                                                 data-tooltip-id="common"
                                                 data-tooltip-content={"Edit"}
+                                                data-tooltip-place="bottom"
 
                                             >
                                                 <EditIcon fontSize="small" />
@@ -1279,7 +1268,8 @@ export default function NodeTree({
                                         selectedNodeId !== 1 && (
 
                                             <Button onClick={handleDelete} style={{ border: "none" }} data-tooltip-id="common"
-                                                data-tooltip-content={"Delete"}>
+                                                data-tooltip-content={"Delete"} data-tooltip-place="bottom"
+                                            >
 
 
                                                 <DeleteIcon fontSize="small" /> </Button>
@@ -1290,7 +1280,8 @@ export default function NodeTree({
                                         !node.isLeaf && (
 
                                             <Button onClick={handleAddChild} style={{ border: "none" }} data-tooltip-id="common"
-                                                data-tooltip-content={"Add Child"}>
+                                                data-tooltip-content={"Add Child"} data-tooltip-place="bottom"
+                                            >
 
 
                                                 <AddIcon />
@@ -1304,7 +1295,7 @@ export default function NodeTree({
                                     {
                                         selectedNodeId !== 1 && (
                                             <Button onClick={handleClone} style={{ border: "none" }} data-tooltip-id="common"
-                                                data-tooltip-content={"Clone Node"}><FileCopyIcon fontSize="small" /></Button>
+                                                data-tooltip-content={"Clone Node"}    data-tooltip-place="bottom"><FileCopyIcon fontSize="small" /></Button>
                                         )
                                     }
                                 </div>

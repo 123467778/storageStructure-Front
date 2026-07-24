@@ -163,10 +163,12 @@ function TreeView({
 
             element.scrollIntoView({
                 behavior: "smooth",
-                block: "start"
+                block: "center"
             });
 
         }
+
+       
 
     };
 
@@ -187,6 +189,7 @@ function TreeView({
 
         scrollToMatch(next);
 
+         
     };
 
 
@@ -207,11 +210,9 @@ function TreeView({
 
         scrollToMatch(previous);
 
+         
+
     };
-
-
-
-
 
 
 
@@ -316,47 +317,14 @@ function TreeView({
 
         <div>
 
-
-
-
-
-            {/* <div style={{ padding: "8px" ,textAlign:"right"}}>
-
-                <SearchIcon/>
-
-                <input type="text" placeholder="search " value={search} onChange={(e) => setSearch(e.target.value)} style={{ width: "200px", height: "30px" }} />
-
-
-            </div> */}
-
-            {/* {
-
-  editable && (
-
-   <div style={{display:"flex", justifyContent:"flex-end",marginRight:"8px",position:"sticky" , top: 0,} }>
-        <Button onClick={reset} data-tooltip-id="common" data-tooltip-content={"Reset structure"} ><RestartAltIcon fontSize="small"/></Button>
-
-    
-   </div> 
-      )
-
-
-
-} */}
-
-            {/* <div style={{ padding:"8px", textAlign:"right" }}> */}
             <div style={{
                 position: "sticky",
                 top: 0,
-              
-              
-             
-                textAlign: "left",
-              
-                
-
-
-            }}>
+                zIndex: 10,
+                background: "#fff",
+                padding: "8px",
+            }}
+            >
 
 
                 <SearchIcon />
@@ -371,11 +339,13 @@ function TreeView({
                     }}
                     style={{
                         width: "200px",
-                        height: "30px",
+                    
                         marginRight: "15px",
-                  
-                       
-                       
+                        border: "none",
+                        borderBottom: "2px solid #b8a9a9",
+
+
+
 
                     }}
                 />
@@ -420,7 +390,15 @@ function TreeView({
 
             </div>
 
-            {
+
+
+
+            {/* <div style={{ padding:"8px", textAlign:"right" }}> */}
+
+
+
+        <div style={{gap:"5px"}}>
+                {
                 tree.map(node => (
 
                     <NodeTree
@@ -458,6 +436,8 @@ function TreeView({
 
                 ))
             }
+        </div>
+
 
 
 
