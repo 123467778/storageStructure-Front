@@ -1019,7 +1019,7 @@ export default function NodeTree({
             const nodename = node.name.replace(/\d+$/, '');
 
 
-                                              
+
             const newName = `${nodename}${tree.length + 1}`;
             cloned = cloneNode(node, newName);
         }
@@ -1041,7 +1041,7 @@ export default function NodeTree({
                     }
                 }
             );
-           
+
 
         } catch (err) {
             console.log(err);
@@ -1215,7 +1215,9 @@ export default function NodeTree({
                                                     : "#DCDCDC",
 
                                         }}
-
+                                        data-tooltip-id="common"
+                                        data-tooltip-content={node.displayName}
+                                        data-tooltip-place="left"
 
                                     />
 
@@ -1289,7 +1291,7 @@ export default function NodeTree({
                                     {
                                         selectedNodeId !== 1 && (
                                             <Button onClick={handleClone} style={{ border: "none" }} data-tooltip-id="common"
-                                                data-tooltip-content={"Clone Node"}    data-tooltip-place="bottom"><FileCopyIcon fontSize="small" /></Button>
+                                                data-tooltip-content={"Clone Node"} data-tooltip-place="bottom"><FileCopyIcon fontSize="small" /></Button>
                                         )
                                     }
                                 </div>
