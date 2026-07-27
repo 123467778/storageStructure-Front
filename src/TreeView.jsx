@@ -108,8 +108,6 @@ function TreeView({
 
 
 
-
-
     const collectMatches = (nodes) => {
 
         nodes.forEach(node => {
@@ -296,17 +294,35 @@ function TreeView({
         onTreeChange?.(finalTree);
 
 
-        axios.put(
+        // axios.put(
+        //     `http://localhost:8081/structure/editNode/${selectedContainerName}`,
+        //     {
+        //         nodedata: {
+        //             tree: finalTree
+        //         }
+        //     }
+        // ).catch(err => {
+        //     console.log(err);
+        //     alert("clone failed");
+        // });
+
+        try {
+           axios.put(
             `http://localhost:8081/structure/editNode/${selectedContainerName}`,
             {
                 nodedata: {
                     tree: finalTree
                 }
-            }
-        ).catch(err => {
-            console.log(err);
+            });
+
+          const res = await  axios.get( `http://localhost:8081/structure/getTree/${selectedContainerName}`);
+
+          setTree(res.data.tree);
+        }
+        catch(e){
+            console.log(e);
             alert("clone failed");
-        });
+        }
     };
 
 
