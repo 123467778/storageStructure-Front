@@ -12,17 +12,51 @@ import GridViewIcon from "@mui/icons-material/GridView";
 import ScienceIcon from "@mui/icons-material/Science";
 import BiotechIcon from "@mui/icons-material/Biotech";
 import KitchenIcon from "@mui/icons-material/Kitchen";
+import EditIcon from "@mui/icons-material/Edit";
+
 
 
 function AddStructure({ onClose }) {
   const [HierarchicalName, setHierarchicalName] = useState("");
   const [description, setDescription] = useState("");
 
+  const [showDialog, setShowDialog] = useState(false);
+
+  const [editNode, setEditNode] = useState({
+    nodeName: "",
+    quantity: "",
+    isLeaf: false,
+    rows: "",
+    columns: "",
+    icon: null
+  });
+
+
+  const styles = {
+    overlay: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: "rgba(0,0,0,0.5)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 9999
+    },
+    modal: {
+      background: "white",
+      padding: "20px",
+      borderRadius: "8px",
+      minWidth: "450px"
+    }
+  };
+
 
   const [node, setNode] = useState({
     nodeName: "",
     displayName: "",
-    // nodeCode: "",
     quantity: "",
     isLeaf: false,
     rows: "",
@@ -53,12 +87,29 @@ function AddStructure({ onClose }) {
       return;
     }
 
-    if (!node.quantity || Number(node.quantity) <= 0) {
+   if ( node.nodeName.length > 30) {
+    alert("Node name should not exceed 30 characters.");
+    return;
+}
+
+      if(/[^a-zA-Z0-9]/.test(node.nodeName)){
+    alert("node name should not contain special character")
+    return;
+  }
+
+
+if (!node.quantity || Number(node.quantity) <= 0 ) {
       alert("Quantity must be greater than 0");
       return;
     }
 
-    if(!node.icon){
+if((!/^\d{1,2}$/.test(node.quantity))){
+  alert("Quantity should have only two digit or should not allow floating points");
+  return;
+}
+
+
+    if (!node.icon) {
       alert("select an icon");
       return;
     }
@@ -66,20 +117,27 @@ function AddStructure({ onClose }) {
     const newNode = {
       level: levels.length + 1,
       nodeName: node.nodeName,
-      // nodeCode: node.nodeCode,
       displayName: node.nodeName,
       quantity: Number(node.quantity),
       isLeaf: node.isLeaf,
+
       rows: node.isLeaf ? Number(node.rows) : null,
       columns: node.isLeaf ? Number(node.columns) : null,
       icon: node.icon?.value,
       iconLabel: node.icon?.label
     };
 
+
+
+
+
     setLevels([...levels, newNode]);
 
     resetForm();
   };
+
+
+
 
 
 
@@ -111,6 +169,15 @@ function AddStructure({ onClose }) {
       alert("Add at least one node");
       return;
     }
+
+
+const hasEndNode = levels.some(level => level.isLeaf);
+
+  if (!hasEndNode) {
+    alert("Please mark one node as the End Node before saving the structure.");
+    return;
+  }
+
 
     const payload = {
       HierarchicalName: HierarchicalName,
@@ -158,7 +225,55 @@ function AddStructure({ onClose }) {
 
 
 
+  const handleEdit = (item) => {
+    const selectedIcon = options.find(
+      (opt) => opt.value === item.icon
+    );
 
+    setEditNode({
+      ...item,
+      icon: selectedIcon
+    });
+
+    setShowDialog(true);
+  };
+
+  
+  const saveEdit = () => {
+  let updatedLevels = levels.map((item) =>
+    item.level === editNode.level
+      ? {
+          ...editNode,
+          icon: editNode.icon?.value,
+          iconLabel: editNode.icon?.label
+        }
+      : item
+  );
+
+  if (editNode.isLeaf) {
+    const hasChildLevels = levels.some(
+      (item) => item.level > editNode.level
+    );
+
+    if (hasChildLevels) {
+      const confirmDelete = window.confirm(
+        "This node is being marked as the End Node. All levels below it will be deleted. Continue?"
+      );
+
+      if (!confirmDelete) {
+        return;
+      }
+
+      updatedLevels = updatedLevels.filter(
+        (item) => item.level <= editNode.level
+      );
+    }
+  }
+
+  setLevels(updatedLevels);
+  setShowDialog(false);
+  setEditNode(null);
+};
 
 
   const options = [
@@ -175,7 +290,7 @@ function AddStructure({ onClose }) {
     {
       value: "box",
       label: "Box",
-      icon: <i className="bi bi-box-seam"  />
+      icon: <i className="bi bi-box-seam" />
     },
     {
       value: "shelf",
@@ -303,8 +418,8 @@ function AddStructure({ onClose }) {
               setNode(prev => ({
                 ...prev,
                 isLeaf: e.target.checked,
-                 
-      icon: e.target.checked ? boxOption : null
+
+                icon: e.target.checked ? boxOption : null
               }))
             }
           />
@@ -446,9 +561,204 @@ function AddStructure({ onClose }) {
           }}
         />
 
+        <GridColumn title="Action" width="50px" cell={(props) => (
+          <td >
+            <Button
+
+              onClick={() => {
+                handleEdit(props.dataItem)
+              }}
+              style={{ border: "none" }}
+
+              data-tooltip-id="common"
+              data-tooltip-content={"Edit"}
+              data-tooltip-place="bottom"
+
+            >
+              <EditIcon fontSize="small" />
+
+            </Button>
+          </td>
+        )}
+
+
+
+
+        />
+
+
 
 
       </Grid>
+
+      {showDialog && (
+
+
+        <div
+          style={styles.overlay}
+          onClick={() => setShowDialog(false)}
+        >
+          <div
+            style={styles.modal}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button onClick={() => setShowDialog(false)} style={{ justifyContent: "end" }}>X</Button>
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">
+                node Name
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                value={editNode?.nodeName || ""}
+                onChange={(e) => {
+                  setEditNode(prev => ({
+                    ...prev,
+                    nodeName: e.target.value
+                  }));
+                }}
+
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">
+                quantity
+              </label>
+              <input
+                type="number"
+                className="form-control"
+                value={editNode?.quantity || ""}
+
+                onChange={(e) => {
+                  setEditNode(prev => ({
+                    ...prev,
+                    quantity: e.target.value
+                  }));
+                }}
+
+
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">
+                IsLeaf
+              </label>
+              <input
+                type="checkbox"
+                name="isLeaf"
+                checked={editNode?.isLeaf || false}
+                style={{ margin: "8px" }}
+                onChange={(e) =>
+                  setEditNode(prev => ({
+                    ...prev,
+                    isLeaf: e.target.checked,
+
+                    icon: e.target.checked ? boxOption : null
+                  }))
+                }
+              />
+            </div>
+
+            {
+              editNode.isLeaf && (
+                <>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Row
+                    </label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      value={editNode?.rows || ""}
+                      onChange={(e) => {
+                        setEditNode(prev => ({
+                          ...prev,
+                          rows: e.target.value
+                        }));
+                      }}
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Column
+                    </label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      value={editNode?.columns || ""}
+                      onChange={(e) => {
+                        setEditNode(prev => ({
+                          ...prev,
+                          columns: e.target.value
+                        }));
+                      }}
+                    />
+                  </div>
+                </>
+              )
+            }
+
+            <div className="mb-3">
+
+              <Select
+                options={options}
+                value={editNode?.isLeaf ? boxOption : editNode?.icon}
+                isDisabled={editNode?.isLeaf}
+                styles={{
+                  container: (base) => ({
+                    ...base,
+                    width: "200px"
+                  })
+                }}
+                formatOptionLabel={(option) => (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px"
+                    }}
+                  >
+                    {option.icon}
+                    <span>{option.label}</span>
+                  </div>
+                )}
+                onChange={(selected) =>
+                  setEditNode((prev) => ({
+                    ...prev,
+                    icon: selected
+                  }))
+                }
+                isClearable
+              />
+
+              <Button style={{ marginTop: "10px" }} onClick={saveEdit}>save edit </Button>
+
+            </div>
+
+
+
+
+          </div>
+        </div>
+
+
+
+      )}
+
+
+
+
+
+
+
+
+
 
       <div
         style={{

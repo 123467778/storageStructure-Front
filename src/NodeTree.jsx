@@ -778,6 +778,7 @@ const nextNode=findNodeById(tree,node.id+1);
                                                 onClick={(e) => {
 
                                                     e.stopPropagation();
+                                                    setEditName(node.displayName || node.name);
                                                     setIsEditing(true);
 
                                                 }}
