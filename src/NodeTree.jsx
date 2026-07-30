@@ -27,7 +27,7 @@ import { generateTree } from "./treeGenerator";
 
 export default function NodeTree({
     node, tree, setTree, selectedNodeId, setSelectedNodeId, editable, selectedContainerName, editNode, deleteNode, addChildNode, search, registerMatchRef, activeMatch, matches,
-    selectedHierarchy
+    selectedHierarchy,approval
 
 }) {
 
@@ -42,6 +42,10 @@ export default function NodeTree({
     const [editName, setEditName] = useState(node.displayName);
 
     const[treeDatas,setTreeDatas] =useState([]);
+
+    
+
+    
 
     const nodeRef = useRef(null);
 
@@ -76,14 +80,7 @@ export default function NodeTree({
 
 
 
-        const getAllTree = async ()=>{
-            const res = await axios.get( `http://localhost:8081/structure/getNodeData`);
-
-            setTreeDatas(res.data);
-            return res.data;
-
-
-        }
+      
 
 
 
@@ -109,7 +106,7 @@ export default function NodeTree({
   }
      
 
-const dataTree = await getAllTree();
+//const dataTree = await getAllTree();
 
 
 const isDuplicateName = (nodes, editName) => {
@@ -122,9 +119,7 @@ const isDuplicateName = (nodes, editName) => {
 };
 
 
-const isDuplicate = dataTree.some(item =>
-  isDuplicateName(item.tree, editName)
-);
+const isDuplicate = isDuplicateName(tree,editName);
 
 if (isDuplicate) {
   alert("Node name already exists");
@@ -132,6 +127,7 @@ if (isDuplicate) {
   
   return;
 }
+
 
 console.log("tree data's" ,treeDatas);
 
@@ -177,6 +173,7 @@ console.log("tree data's" ,treeDatas);
             );
             setTree(res.data.tree);
         }
+        
         catch (err) {
 
             console.log(err);
@@ -770,6 +767,10 @@ const nextNode=findNodeById(tree,node.id+1);
                                 &&
                                 editable
                                 &&
+                                !approval
+                                &&
+                               
+                                
 
                                 <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
                                     {
@@ -783,9 +784,8 @@ const nextNode=findNodeById(tree,node.id+1);
 
                                                 }}
                                                 style={{ border: "none" }}
-
                                                 data-tooltip-id="common"
-                                                data-tooltip-content={"Edit"}
+                                                data-tooltip-content={`Edit ${node.icon}`}
                                                 data-tooltip-place="bottom"
 
                                             >
@@ -799,7 +799,7 @@ const nextNode=findNodeById(tree,node.id+1);
                                         selectedNodeId !== 1 && (
 
                                             <Button onClick={handleDelete} style={{ border: "none" }} data-tooltip-id="common"
-                                                data-tooltip-content={"Delete"} data-tooltip-place="bottom"
+                                            data-tooltip-content={`Delete ${node.icon}`} data-tooltip-place="bottom" 
                                             >
 
 
@@ -826,7 +826,7 @@ const nextNode=findNodeById(tree,node.id+1);
                                     {
                                         selectedNodeId !== 1 && (
                                             <Button onClick={handleClone} style={{ border: "none" }} data-tooltip-id="common"
-                                                data-tooltip-content={"Clone Node"} data-tooltip-place="bottom"><FileCopyIcon fontSize="small" /></Button>
+                                                data-tooltip-content={` Clone ${node.icon}`} data-tooltip-place="bottom"><FileCopyIcon fontSize="small" /></Button>
                                         )
                                     }
                                 </div>
@@ -881,7 +881,9 @@ const nextNode=findNodeById(tree,node.id+1);
                         matches={matches}
 
                         selectedHierarchy={selectedHierarchy}
-
+                        approval={approval}
+                   
+                        
 
                     />
 

@@ -11,6 +11,9 @@ import TreeView from "./TreeView";
 import useStructureTree from "./useStructureTree";
 
 function GetHierarchical() {
+
+
+    
     const [structures, setStructures] = useState([]);
     const [skip, setSkip] = useState(0);
     const [take, setTake] = useState(5);

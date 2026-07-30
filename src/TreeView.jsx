@@ -88,13 +88,13 @@ function TreeView({
     editable,
     selectedContainerName,
     onTreeChange, selectedHierarchy,
-    originalTree, handleStructure
+    originalTree, handleStructure,approval
 }) {
 
 
     const [tree, setTree] = useState([]);
 
-    const [selectedNodeId, setSelectedNodeId] = useState(null);
+    const [selectedNodeId, setSelectedNodeId] = useState(0);
 
     const [search, setSearch] = useState(null);
 
@@ -343,7 +343,7 @@ function TreeView({
             >
 
 
-                <SearchIcon />
+                <SearchIcon data-tooltip-id="common" data-tooltip-content={"Search"}   />
 
                 <input
                     type="text"
@@ -393,7 +393,7 @@ function TreeView({
                     editable && (
 
 
-                        <Button onClick={reset} data-tooltip-id="common" data-tooltip-content={"Reset structure"} ><RestartAltIcon fontSize="small" /></Button>
+                        <Button onClick={reset} data-tooltip-id="common" data-tooltip-content={"Reset structure"}><RestartAltIcon fontSize="small" /></Button>
 
 
 
@@ -403,6 +403,7 @@ function TreeView({
 
                 }
 
+              
 
             </div>
 
@@ -446,8 +447,9 @@ function TreeView({
                         registerMatchRef={registerMatchRef}
                         activeMatch={activeMatch}
                         matches={matches}
-
-
+                        approval={approval}
+                 
+                       
                     />
 
                 ))

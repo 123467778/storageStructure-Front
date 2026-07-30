@@ -67,8 +67,6 @@ function AddStructure({ onClose }) {
 
   const [levels, setLevels] = useState([]);
 
-
-
   const resetForm = () => {
     setNode({
       nodeName: "",
@@ -113,6 +111,8 @@ if((!/^\d{1,2}$/.test(node.quantity))){
       alert("select an icon");
       return;
     }
+
+
 
     const newNode = {
       level: levels.length + 1,
