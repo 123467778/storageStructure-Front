@@ -10,8 +10,6 @@ import { uuidGeneration } from "./treeGenerator";
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 
 
-
-
 import TreeView from "./TreeView";
 
 function StructureMapping() {
@@ -76,7 +74,7 @@ function StructureMapping() {
 
     const loadStructure = () => {
         axios.get("http://localhost:8081/structure/getMap")
-            .then(res => setStructure(res.data))
+            .then(res => {setStructure(res.data)})
             .catch(err => console.log(err));
     };
 
@@ -85,6 +83,8 @@ function StructureMapping() {
         loadStructure();
     }, []);
 
+
+   
 
 
 
@@ -105,17 +105,25 @@ function StructureMapping() {
 
         if (!selected) {
             alert("select Hierarchical Name");
-        }
-
-
-        const isDuplicate = structure.some(
-            item => item.scontainername.toLowerCase() === scontainername.toLowerCase()
-        );
-
-        if (isDuplicate) {
-            alert("Container name already exists");
             return;
         }
+
+
+        // const isDuplicate = structure.some(
+        //     item => item.scontainername.toLowerCase() === scontainername.toLowerCase()
+        // );
+        // //  const isDuplicate = structure.some(
+        // //     item => item.scontainername === scontainername
+        // // );
+
+        // if (isDuplicate) {
+        //     alert("Container name already exists");
+        //     setContainername("");
+        //     setDescription("");
+        //     setSelected(null);
+
+        //     return;
+        // }
 
 
 
@@ -145,7 +153,13 @@ function StructureMapping() {
                 loadStructure();
                 console.log("Node data saved:", data.nodedata);
             })
-            .catch(err => console.log(err));
+            // .catch(err => alert(err.response?.data?.message));
+            .catch(err => {
+  console.log(err);
+  console.log(err.response);
+  console.log(err.response?.data);
+  alert(err.response?.data);
+});
 
         setContainername("");
         setDescription("");
@@ -229,74 +243,6 @@ function StructureMapping() {
     };
 
 
-    //   const getAllTree = async ()=>{
-    //             const res = await axios.get( `http://localhost:8081/structure/getNodeData`);
-
-
-    //             return res.data;
-
-
-    //         }
-
-    // const approveAction = async(dataItem)=>{
-
-    //     const dataTree = await getAllTree();
-
-
-    // const isDuplicateName = (nodes, naming) => {
-
-    //   return nodes.some(node =>
-    //     node.displayName?.trim().toLowerCase() ===
-    //       naming.trim().toLowerCase() ||
-    //     isDuplicateName(node.children || [],naming)
-    //   );
-    // };
-
-    // //const data = await getTree(dataItem.scontainername);
-
-    // // const allNames = [];
-    // // const collectNames = (nodes) => {
-    // // nodes.forEach(node => {
-    // // allNames.push(node.displayName);
-    // // collectNames(node.children || []);
-    // // });
-
-    // // };
-
-    // // data.forEach(item => collectNames(item.tree));
-
-    // //const data = await getTree(dataItem.scontainername);
-
-    // const treeResponse = await axios.get(
-    // `http://localhost:8081/structure/getTree/${dataItem.scontainername}`
-    // );
-    // const tree = treeResponse.data.tree;
-
-    // const allNames = [];
-
-    // const collectNames = (nodes) => {
-    //   nodes.forEach(node => {
-    //     allNames.push(node.displayName);
-    //     collectNames(node.children || []);
-    //   });
-    // };
-
-    // collectNames(tree);
-
-    // console.log(allNames);
-
-    // const isDuplicate = dataTree.some(item =>
-    //   isDuplicateName(item.tree,tree)
-    // );
-
-    // if (isDuplicate) {
-    //   alert("Node name already exists");
-
-    //   return;
-    // }
-
-
-    // }
 
     const getAllTree = async () => {
         const res = await axios.get(
@@ -305,129 +251,7 @@ function StructureMapping() {
         return res.data;
     };
 
-    // const approveAction = async (dataItem) => {
-    //   const dataTree = await getAllTree();
-
-    //   const treeResponse = await axios.get(
-    //     `http://localhost:8081/structure/getTree/${dataItem.scontainername}`
-    //   );
-
-    //   const tree = treeResponse.data.tree;
-
-    //   const allNames = [];
-
-    //   const collectNames = (nodes) => {
-    //     nodes.forEach((node) => {
-    //       if (node.displayName) {
-    //         allNames.push(node.displayName.trim().toLowerCase());
-    //       }
-
-    //       collectNames(node.children || []);
-    //     });
-    //   };
-
-    //   collectNames(tree);
-
-    //   const isDuplicateName = (nodes, name) => {
-    //     return nodes.some(
-    //       (node) =>
-    //         node.displayName?.trim().toLowerCase() === name ||
-    //         isDuplicateName(node.children || [], name)
-    //     );
-    //   };
-
-
-    //  const isDuplicate = dataTree.some(
-    //   item =>
-    //     item.scontainername !== dataItem.scontainername &&
-    //     isDuplicateName(item.tree, allNames)
-    // );
-
-
-
-    //   if (isDuplicate) {
-    //     alert("Node name already exists");
-    //     return;
-    //   }
-
-    //   else{
-    //     alert("Approved")
-    //   }
-    // };
-
-    // const approveAction = async (dataItem) => {
-    //    try {
-    //     const dataTree = await getAllTree();
-
-    //     // Tree being approved
-    //     const treeResponse = await axios.get(
-    //       `http://localhost:8081/structure/getTree/${dataItem.scontainername}`
-    //     );
-
-    //     const currentTree = treeResponse.data.tree;
-
-    //     // Collect all node names from current tree
-    //     const currentTreeNames = new Set();
-
-    //     const collectNames = (nodes, targetSet) => {
-    //       nodes.forEach((node) => {
-    //         if (node.displayName) {
-    //           targetSet.add(node.displayName.trim().toLowerCase());
-    //         }
-
-    //         if (node.children?.length) {
-    //           collectNames(node.children, targetSet);
-    //         }
-    //       });
-    //     };
-
-    //     collectNames(currentTree, currentTreeNames);
-
-    //     // Check all other trees
-    //     let duplicateFound = false;
-    //     let duplicateName = "";
-
-    //     for (const item of dataTree) {
-    //       // Skip current tree
-    //       if (item.root.displayName === dataItem.scontainername) {
-    //         continue;
-    //       }
-
-    //       const checkDuplicates = (nodes) => {
-    //         for (const node of nodes) {
-    //           const nodeName = node.displayName?.trim().toLowerCase();
-
-    //           if (nodeName && currentTreeNames.has(nodeName)) {
-    //             duplicateFound = true;
-    //             duplicateName = node.displayName;
-    //             return;
-    //           }
-
-    //           if (node.children?.length) {
-    //             checkDuplicates(node.children);
-    //           }
-
-    //           if (duplicateFound) return;
-    //         }
-    //       };
-
-    //       checkDuplicates(item.tree || []);
-
-    //       if (duplicateFound) break;
-    //     }
-
-    //     if (duplicateFound) {
-    //       alert(`Node name "${duplicateName}" already exists in another tree`);
-    //       return;
-    //     }
-
-    //     alert("Approved");
-    //   } catch (error) {
-    //     console.error(error);
-    //     alert("Error while validating trees");
-    //   }
-
-    // };
+   
 
     const approveAction = async (dataItem) => {
         if(dataItem.status!=="approved"){
@@ -443,6 +267,8 @@ function StructureMapping() {
 
             const currentTreeNames = new Set();
 
+         
+
             const collectNames = (nodes) => {
                 nodes.forEach((node) => {
                     if (node.displayName) {
@@ -457,36 +283,39 @@ function StructureMapping() {
 
             collectNames(currentTree);
 
-            for (const item of dataTree) {
+       
 
-                if (item.tree?.[0]?.displayName === dataItem.scontainername) continue;
+const duplicate = new Set();
 
-                const checkNodes = (nodes) => {
-                    for (const node of nodes) {
+for (const item of dataTree) {
+    if (item.tree?.[0]?.displayName === dataItem.scontainername) continue;
 
-                        const name = node.displayName?.trim().toLowerCase();
+    const checkNodes = (nodes) => {
+        for (const node of nodes) {
+            const name = node.displayName?.trim().toLowerCase();
 
-                        if (name && currentTreeNames.has(name)) {
-                            alert(`Duplicate node found: ${node.displayName}`);
-                            return true;
-                        }
-
-                        if (node.children?.length && checkNodes(node.children)) {
-                            return true;
-                        }
-                    }
-
-                    return false;
-                };
-
-                if (checkNodes(item.tree || [])) {
-                    return;
-                }
+            if (name && currentTreeNames.has(name)) {
+                duplicate.add(name.toUpperCase());
             }
 
+            if (node.children?.length) {
+                checkNodes(node.children);
+            }
+        }
+    };
 
+    checkNodes(item.tree || []);
+}
 
-            alert("Approve");
+if (duplicate.size > 0) {
+    alert(
+        `Duplicate node found: ${[...duplicate]}`
+    );
+   
+    return;
+}
+
+        alert("Approve");
 
             axios.put(
 
@@ -603,6 +432,8 @@ function StructureMapping() {
                     <GridColumn field="scontainername" title="Container Name" />
                     <GridColumn field="sdescription" title="Description" />
                     <GridColumn field="shierarchicalname" title="Hierarchical Name" />
+                    <GridColumn field="status" title="Status" />
+
 
                     <GridColumn
                         title="Actions"
