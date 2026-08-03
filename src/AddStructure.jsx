@@ -216,7 +216,7 @@ const hasEndNode = levels.some(level => level.isLeaf);
 
       if (err.response) {
         console.log(err.response.data);
-        alert(err.response.data.message || "Save Failed");
+        alert(err.response.data || "Save Failed");
       } else {
         alert("Something went wrong");
       }

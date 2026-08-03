@@ -257,70 +257,74 @@ function StructureMapping() {
         if(dataItem.status!=="approved"){
           
              try {
-            const dataTree = await getAllTree();
 
-            const treeResponse = await axios.get(
-                `http://localhost:8081/structure/getTree/${dataItem.scontainername}`
-            );
+//             const dataTree = await getAllTree();
 
-            const currentTree = treeResponse.data.tree;
+//             const treeResponse = await axios.get(
+//                 `http://localhost:8081/structure/getTree/${dataItem.scontainername}`
+//             );
 
-            const currentTreeNames = new Set();
+//             const currentTree = treeResponse.data.tree;
+
+//             const currentTreeNames = new Set();
 
          
 
-            const collectNames = (nodes) => {
-                nodes.forEach((node) => {
-                    if (node.displayName) {
-                        currentTreeNames.add(node.displayName.trim().toLowerCase());
-                    }
+//             const collectNames = (nodes) => {
+//                 nodes.forEach((node) => {
+//                     if (node.displayName) {
+//                         currentTreeNames.add(node.displayName.trim().toLowerCase());
+//                     }
 
-                    if (node.children?.length) {
-                        collectNames(node.children);
-                    }
-                });
-            };
+//                     if (node.children?.length) {
+//                         collectNames(node.children);
+//                     }
+//                 });
+//             };
 
-            collectNames(currentTree);
+//             collectNames(currentTree);
 
        
 
-const duplicate = new Set();
+// const duplicate = new Set();
 
-for (const item of dataTree) {
-    if (item.tree?.[0]?.displayName === dataItem.scontainername) continue;
+// for (const item of dataTree) {
+//     if (item.tree?.[0]?.displayName === dataItem.scontainername) continue;
 
-    const checkNodes = (nodes) => {
-        for (const node of nodes) {
-            const name = node.displayName?.trim().toLowerCase();
+//     const checkNodes = (nodes) => {
+//         for (const node of nodes) {
+//             const name = node.displayName?.trim().toLowerCase();
 
-            if (name && currentTreeNames.has(name)) {
-                duplicate.add(name.toUpperCase());
-            }
+//             if (name && currentTreeNames.has(name)) {
+//                 duplicate.add(name.toUpperCase());
+//             }
 
-            if (node.children?.length) {
-                checkNodes(node.children);
-            }
-        }
-    };
+//             if (node.children?.length) {
+//                 checkNodes(node.children);
+//             }
+//         }
+//     };
 
-    checkNodes(item.tree || []);
-}
+//     checkNodes(item.tree || []);
+// }
 
-if (duplicate.size > 0) {
-    alert(
-        `Duplicate node found: ${[...duplicate]}`
-    );
+// if (duplicate.size > 0) {
+//     alert(
+//         `Duplicate node found: ${[...duplicate]}`
+//     );
    
-    return;
-}
+//     return;
+// }
 
-        alert("Approve");
+//         alert("Approve");
 
-            axios.put(
+  const response= await axios.put(
 
                 `http://localhost:8081/structure/getApprove/${dataItem.scontainername}`);
+            
+                console.log(response);
 
+           alert(response.data);
             setStructure(prev =>
 
                 prev.map(item =>
@@ -334,12 +338,18 @@ if (duplicate.size > 0) {
                 )
 
             );
+
+            
     
             }
     
     catch (error) {
-                console.error(error);
-                alert("Error while validating.");
+                 if (error.response) {
+        alert(error.response.data);
+        console.log("Error response:", error.response.data);
+    } else {
+        alert("Error while validating.");
+    }
             }
         }
        
